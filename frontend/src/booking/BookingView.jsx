@@ -157,7 +157,8 @@ return (
         route="/bookings/xml"
         authenticationKey={localStorage.getItem("auth-key") || ""}
         filename="members.xml"
-        className="btn h-12 w-full rounded-lg border border-[#452078] bg-white px-5 font-semibold text-[#452078] shadow-sm hover:bg-purple-50"
+    className="btn h-12 w-full rounded-lg !border-[#452078] !bg-[#452078] px-5 font-semibold !text-white shadow-sm hover:!bg-[#65429a]"
+
     >
         Export Previous Bookings (XML)
     </XMLDownloadButton>
@@ -236,7 +237,7 @@ return (
 
             {/* Cancel only the selected booking */}
             <button
-                className="btn min-w-24 rounded-lg border-red-600 bg-red-600 px-4 font-semibold text-white hover:border-red-700 hover:bg-red-700"
+                className="btn min-w-24 rounded-lg border-red-600 bg-red-600 px-4 font-semibold text-white hover:border-red-700 hover:bg-red-700 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 motion-reduce:transform-none motion-reduce:transition-none"
                 onClick={() => cancelBooking(booking.id)}
                 disabled={cancelling === booking.id}
             >
