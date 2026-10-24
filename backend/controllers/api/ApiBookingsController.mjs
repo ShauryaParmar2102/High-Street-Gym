@@ -8,7 +8,7 @@ export class ApiBookingsController{
     static routes = express.Router();
 
     static {
-    // Run authentication middleware for API requests
+    // Run authentication middleware for API requests 
     this.routes.use(ApiAuthenticationController.middleware);
 
     // Allow access only to authenticated users
