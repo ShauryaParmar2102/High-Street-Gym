@@ -146,7 +146,7 @@ return (
     <h1 className="text-3xl font-bold text-neutral-900">
         My Bookings
     </h1>
-    <p className="text-sm text-gray-400 mt-1">
+    <p className="text-sm text-black-400 mt-1">
         View and manage your scheduled gym sessions.
     </p>
 </div>
