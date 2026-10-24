@@ -225,7 +225,7 @@ const request =
             {sessions.map((session) => (
                 <li
                     key={session.session_id}
-                    className="flex min-w-0 flex-col justify-between gap-4 rounded-xl border border-neutral-200 bg-white p-5 text-neutral-900 shadow-md"
+                    className="flex min-w-0 flex-col justify-between gap-4 rounded-xl border border-neutral-200 bg-white p-5 text-neutral-900 shadow-md transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl motion-reduce:transform-none motion-reduce:transition-none"
                 >
                     <div className="min-w-0 space-y-2">
                         <div className="text-lg font-bold text-neutral-900">
