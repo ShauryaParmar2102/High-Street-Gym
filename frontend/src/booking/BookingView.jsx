@@ -157,8 +157,7 @@ return (
         route="/bookings/xml"
         authenticationKey={localStorage.getItem("auth-key") || ""}
         filename="members.xml"
-    className="btn h-12 w-full rounded-lg !border-[#452078] !bg-[#452078] px-5 font-semibold !text-white shadow-sm hover:!bg-[#65429a]"
-
+    className="h-12 w-full rounded-lg border border-[#452078] bg-white px-5 font-semibold text-[#452078] shadow-sm hover:bg-purple-50 cursor-pointer"
     >
         Export Previous Bookings (XML)
     </XMLDownloadButton>
