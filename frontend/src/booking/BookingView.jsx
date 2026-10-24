@@ -192,7 +192,8 @@ return (
     return (
         <li
             key={booking.id}
-             className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-start rounded-xl border border-neutral-200 bg-white p-5 text-neutral-900 shadow-sm transition-colors hover:border-neutral-300"
+                 className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-start rounded-xl border border-neutral-200 bg-white p-5 text-neutral-900 shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg hover:border-neutral-300"
+
         >
             <div>
                 {/* Display the activity name */}
