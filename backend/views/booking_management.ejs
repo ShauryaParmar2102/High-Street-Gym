@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include("partials/head.ejs") %>
+  <title>Booking Management - High Street Gym</title>
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+
+  <%- include("partials/admin-navbar.ejs") %>
+
+  <main class="w-full max-w-5xl mx-auto px-6 sm:px-8 py-6 flex flex-col">
+    <!-- Booking management page heading -->
+    <h1 class="text-3xl font-bold text-gray-800 mb-2 text-center">
+      Manage Bookings
+    </h1>
+
+    <p class="text-gray-600 mb-6 text-center">
+      View and manage member session bookings.
+    </p>
+
+  
+
+
+     <!-- Create / Edit Booking -->
+    <section id="edit-booking"
+  class="crud-form order-1 bg-white border border-gray-200 rounded-xl p-6 shadow-sm mb-6">
+
+      <h2 class="text-2xl font-semibold text-gray-900 mb-5 text-center">
+
+        <%= selectedBooking ? "Edit Booking" : "Create Booking" %>
+      </h2>
+
+      <form action="/booking" method="post" class="space-y-4 w-full max-w-xl mx-auto px-4 sm:px-6">
+
+        <!-- Booking ID -->
+        <input
+          type="hidden"
+          name="id"
+          value="<%= selectedBooking?.id || '' %>"
+        >
+
+        <!-- Action -->
+        <input
+          type="hidden"
+          name="action"
+          value="<%= selectedBooking ? 'update' : 'create' %>"
+        >
+
+        <!-- Member -->
+        <div>
+
+          <label class="text-sm font-medium text-gray-700">
+            Member
+          </label>
+
+          <select
+            name="userId"
+            required
+            class="w-full border border-gray-300 p-2 rounded-lg mt-1"
+          >
+            <option value="">
+              Select Member
+            </option>
+
+            <% (users || []).filter((u) => u.role === "member").forEach((u) => { %>
+
+              <option
+                value="<%= u.id %>"
+                <%= selectedBooking?.memberId === u.id ? "selected" : "" %>
+              >
+                <%= u.firstName %> <%= u.lastName %>
+              </option>
+
+            <% }) %>
+
+          </select>
+
+        </div>
+
+        <!-- Session -->
+        <div>
+
+          <label class="text-sm font-medium text-gray-700">
+            Session
+          </label>
+
+          <select
+            name="sessionId"
+            required
+            class="w-full border border-gray-300 p-2 rounded-lg mt-1"
+          >
+
+            <option value="">
+              Select Session
+            </option>
+
+            <% (sessions || []).forEach((s) => { %>
+
+              <option
+                value="<%= s.session.id %>"
+                <%= selectedBooking?.sessionId === s.session.id ? "selected" : "" %>
+              >
+                <%= s.activity?.name || "" %>
+                |
+                <%= s.location?.name || "" %>
+                |
+                <%= s.user?.firstName || "" %>
+                <%= s.user?.lastName || "" %>
+                |
+                <%= s.session?.startTime || "" %>
+                -
+                <%= s.session?.endTime || "" %>
+              </option>
+
+            <% }) %>
+
+          </select>
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-center gap-4 pt-2" style="margin-top: 25px; margin-bottom: 30px;">
+
+
+          <button
+            type="submit"
+            class="bg-hsg-purple text-white px-4 py-3 rounded-xl font-semibold hover:opacity-90 transition"
+          >
+            <%= selectedBooking ? "Update Booking" : "Create Booking" %>
+          </button>
+
+                    <button
+            type="reset"
+            class="w-auto px-6 py-3 bg-hsg-white text-hsg-purple border border-hsg-purple  rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+          >
+            Clear
+          </button>
+
+        </div>
+
+
+        
+
+      </form>
+
+      
+
+    </section>
+<!-- FILTER BOOKINGS -->
+<section class="order-2 bg-white border border-gray-200 rounded-xl shadow-sm p-4 sm:p-6 mb-6">
+
+    <h2 class="text-xl font-bold text-center mb-6">
+        Filter Bookings
+    </h2>
+
+    <!-- Search -->
+<form method="GET" action="/booking"
+      class="booking-filter-form">
+
+    <!-- Search bookings -->
+    <input
+        id="booking-search"
+        type="text"
+        name="search"
+        placeholder="Search bookings..."
+        value="<%= search || '' %>"
+        class="border border-gray-300 px-4 py-3 rounded-xl bg-white focus:outline-none"
+    >
+
+    <!-- Search button -->
+    <button
+        type="submit"
+        class="px-6 py-3 bg-hsg-purple text-white rounded-xl font-semibold hover:opacity-90 transition">
+        Search
+    </button>
+
+    <!-- Clear filters -->
+    <a
+        href="/booking"
+        class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition">
+        Clear
+    </a>
+
+</form>
+
+</section>
+    <!-- Current bookings -->
+    <section class="order-3 bg-white border border-gray-200 rounded-xl p-4 sm:p-6 shadow-sm">
+
+      <h2 class="text-2xl font-semibold text-gray-900 mb-5 text-center">
+        Current Bookings
+      </h2>
+
+      <% if (bookings && bookings.length > 0) { %>
+
+        <div class="booking-desktop-table overflow-x-auto">
+
+          
+
+          <table class="booking-table min-w-[900px] w-full text-sm"
+       style="border-collapse: separate; border-spacing: 0 10px;">
+
+            <thead>
+  <tr class="bg-gray-100 text-gray-700 font-semibold">
+
+    <th class="py-4 px-3 rounded-l-xl">Member</th>
+    <th class="py-4 px-3">Trainer</th>
+    <th class="py-4 px-3">Activity</th>
+    <th class="py-4 px-3">Location</th>
+    <th class="py-4 px-3">Date</th>
+    <th class="py-4 px-3">Time</th>
+    <th class="py-4 px-3 rounded-r-xl">Actions</th>
+
+  </tr>
+</thead>
+
+            <tbody>
+
+              <% bookings.forEach((b) => { %>
+
+                <tr>
+
+                  <!-- Member -->
+                  <td class="booking-cell">
+                    <%= b.user?.firstName || "-" %>
+                    <%= b.user?.lastName || "" %>
+                  </td>
+
+                  <!-- Trainer -->
+                  <td class="booking-cell">
+                    <%= b.session?.user?.firstName || "-" %>
+                    <%= b.session?.user?.lastName || "" %>
+                  </td>
+
+                  <!-- Activity -->
+                  <td class="booking-cell">
+                    <%= b.session?.activity?.name || "-" %>
+                  </td>
+
+                  <!-- Location -->
+                  <td class="booking-cell">
+                    <%= b.session?.location?.name || "-" %>
+                  </td>
+
+                  <!-- Date -->
+                  <td class="booking-cell">
+                    <%= b.session?.session?.sessionDate
+                      ? new Date(b.session.session.sessionDate).toLocaleDateString("en-AU")
+                      : "-"
+                    %>
+                  </td>
+
+                  <!-- Time -->
+                  <td class="booking-cell">
+                    <%= b.session?.session?.startTime || "-" %>
+                    -
+                    <%= b.session?.session?.endTime || "-" %>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="booking-cell">
+
+                    <div class="flex justify-center gap-3">
+
+                      <a
+                        href="/booking?edit=<%= b.id %>#edit-booking"
+                        class="inline-block bg-hsg-purple text-white px-4 py-2 rounded-xl font-semibold hover:opacity-90 transition"
+                      >
+                        Edit
+                      </a>
+
+                      <form action="/booking" method="post">
+
+                        <input
+                          type="hidden"
+                          name="id"
+                          value="<%= b.id %>"
+                        >
+
+                        <input
+                          type="hidden"
+                          name="action"
+                          value="delete"
+                        >
+
+                        <button
+                          type="submit"
+                          class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-2 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+                        >
+                          Delete
+                        </button>
+
+                      </form>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+              <% }) %>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <!-- Mobile bookings -->
+<div class="booking-mobile-cards">
+
+  <% bookings.forEach((b) => { %>
+
+    <div class="border border-gray-200 rounded-xl p-4 mb-4">
+
+      <h3 class="font-bold text-lg mb-3">
+        <%= b.session?.activity?.name || "-" %>
+      </h3>
+
+      <p class="mb-2">
+        <strong>Member:</strong>
+        <%= b.user?.firstName || "-" %>
+        <%= b.user?.lastName || "" %>
+      </p>
+
+      <p class="mb-2">
+        <strong>Trainer:</strong>
+        <%= b.session?.user?.firstName || "-" %>
+        <%= b.session?.user?.lastName || "" %>
+      </p>
+
+      <p class="mb-2">
+        <strong>Location:</strong>
+        <%= b.session?.location?.name || "-" %>
+      </p>
+
+      <p class="mb-2">
+        <strong>Date:</strong>
+        <%= b.session?.session?.sessionDate
+          ? new Date(b.session.session.sessionDate).toLocaleDateString("en-AU")
+          : "-"
+        %>
+      </p>
+
+      <p class="mb-3">
+        <strong>Time:</strong>
+        <%= b.session?.session?.startTime || "-" %>
+        -
+        <%= b.session?.session?.endTime || "-" %>
+      </p>
+
+      <div class="flex gap-3 mt-4">
+
+  <a
+    href="/booking?edit=<%= b.id %>#edit-booking"
+    class="bg-hsg-purple text-white px-4 py-2 rounded-xl font-semibold"
+  >
+    Edit
+  </a>
+
+  <form action="/booking" method="post">
+
+    <input type="hidden" name="id" value="<%= b.id %>">
+    <input type="hidden" name="action" value="delete">
+
+    <button
+      type="submit"
+      class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-2 rounded-xl font-semibold"
+    >
+      Delete
+    </button>
+
+  </form>
+
+</div>
+
+    </div>
+
+  <% }) %>
+
+</div>
+
+      <% } else { %>
+
+        <p class="text-gray-500 text-center">
+          No member bookings were found.
+        </p>
+
+      <% } %>
+
+    </section>
+
+     </main>
+
+</body>
+</html>

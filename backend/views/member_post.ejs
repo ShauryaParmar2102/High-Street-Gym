@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <%- include("partials/head.ejs") %>
+        <title>Member Posts - High Street Gym</title>
+    </head>
+
+    <body class="bg-gray-50 text-gray-900">
+
+             <!-- PUT NAVBAR HERE -->
+        <%- include("partials/admin-navbar.ejs", { user: authenticatedUser }) %>
+
+    <main class="max-w-5xl mx-auto p-6">
+
+       
+
+   <!-- HEADER -->
+<div class="text-center mb-6">
+  <div>
+    <h1 class="text-3xl font-bold mb-2">Member Posts</h1>
+    <p class="text-gray-600">
+      View and manage your posts in the High Street Gym community.
+    </p>
+  </div>
+
+   
+
+  <a href="/post/member/create"
+     class="bg-hsg-purple text-white px-4 py-3 rounded-xl font-semibold">
+    + Create Post
+  </a>
+</div>
+
+       <!-- Display an error if the post could not be created -->
+    <% if (error) { %>
+      <div class="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded mb-4">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <!-- MEMBER POST FEED -->
+<% if (posts && posts.length > 0) { %>
+
+  <!-- GREY HEADING -->
+  <div class="bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 font-semibold text-gray-700"
+       style="background-color: #f3f4f6; margin: 24px 16px 20px; padding: 16px;">
+    Community Posts
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6"
+     style="margin-top: 24px; padding: 0 16px;">
+    <% posts.forEach((post) => { %>
+
+      <!-- Display one microblog post -->
+<article class="bg-white border border-gray-200 rounded-xl p-5 mb-4 shadow-sm"
+         style="padding: 20px; margin-bottom: 16px;">
+
+ <!-- AUTHOR -->
+<p class="text-sm font-semibold text-blue-600 mb-2">
+  <%= post.firstName || "" %>
+  <%= post.lastName || "" %>
+</p>
+
+<!-- DIVIDER -->
+<hr class="border-0 border-t border-gray-200 my-4">
+
+<!-- TITLE -->
+<h2 class="text-lg font-semibold text-gray-900 break-words">
+  <%= post.title %>
+</h2>
+
+<!-- CONTENT -->
+<p class="text-gray-600 text-sm mt-3 leading-relaxed break-words">
+  <%= post.content %>
+</p>
+
+<!-- DATE -->
+<% if (post.createdAt) { %>
+  <div class="mt-4 text-xs text-gray-400">
+    Posted:
+    <%= new Date(post.createdAt).toLocaleDateString("en-AU") %>
+  </div>
+<% } %>
+
+  <!-- Delete button -->
+  <% if (
+    authenticatedUser &&
+    Number(post.userid) === Number(authenticatedUser.id)
+  ) { %>
+
+    <form action="/post/member" method="post" class="mt-5">
+
+      <input type="hidden" name="action" value="delete">
+      <input type="hidden" name="id" value="<%= post.id %>">
+
+      <button
+        type="submit"
+        class="px-4 py-3 bg-hsg-white text-hsg-purple border border-hsg-purple rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+      >
+        Delete Post
+      </button>
+
+    </form>
+
+  <% } %>
+
+</article>
+
+        <% }) %>
+
+    </div>
+
+    <% } else { %>
+
+  <p class="text-gray-500">
+    No posts have been shared yet.
+  </p>
+
+<% } %>
+
+</main>
+
+</body>
+</html>
+

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include("partials/head.ejs") %>
+  <title>High Street Gym - Confirm Booking</title>
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+
+  <%- include("partials/admin-navbar.ejs") %>
+
+  <main class="max-w-2xl mx-auto px-4 py-10"
+      style="padding-top: 30px;">
+
+    <section class="bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
+
+      <h1 class="text-3xl font-bold text-gray-800">
+        Confirm Booking
+      </h1>
+
+      <p class="text-gray-600 mt-2 mb-8">
+        Check the session details below before creating your booking.
+      </p>
+
+      <% if (!session) { %>
+
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p class="text-red-600 font-semibold">
+            This session could not be found.
+          </p>
+        </div>
+
+      <% } else { %>
+
+        <%
+          const selectedSession = session.session;
+          const activity = session.activity;
+          const location = session.location;
+          const trainer = session.user;
+        %>
+
+        <!-- Session details -->
+        <div class="space-y-4">
+
+          <div class="border-b border-gray-200 pb-4">
+            <p class="text-sm text-gray-500">Activity</p>
+            <p class="text-lg font-semibold text-blue-700">
+              <%= activity?.name || "Not available" %>
+            </p>
+          </div>
+
+          <div class="border-b border-gray-200 pb-4">
+            <p class="text-sm text-gray-500">Location</p>
+            <p class="font-semibold text-gray-800">
+              <%= location?.name || "Not available" %>
+            </p>
+          </div>
+
+          <div class="border-b border-gray-200 pb-4">
+            <p class="text-sm text-gray-500">Trainer</p>
+            <p class="font-semibold text-gray-800">
+              <%= trainer?.firstName || "" %>
+              <%= trainer?.lastName || "" %>
+            </p>
+          </div>
+
+          <div class="border-b border-gray-200 pb-4">
+            <p class="text-sm text-gray-500">Date</p>
+            <p class="font-semibold text-gray-800">
+              <%= selectedSession?.sessionDate
+                ? new Date(selectedSession.sessionDate).toLocaleDateString("en-AU")
+                : "Not available"
+              %>
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm text-gray-500">Time</p>
+            <p class="font-semibold text-gray-800">
+              <%= selectedSession?.startTime || "Not available" %>
+              -
+              <%= selectedSession?.endTime || "Not available" %>
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-4">
+
+          <form method="POST" action="/booking/member">
+
+            <input
+              type="hidden"
+              name="sessionId"
+              value="<%= selectedSession.id %>"
+            >
+
+            <button
+              type="submit"
+              class="bg-hsg-purple text-white px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+            >
+              Confirm Booking
+            </button>
+
+          </form>
+
+          <a
+            href="/session/member/view"
+            class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+          >
+            Cancel
+          </a>
+
+        </div>
+
+      <% } %>
+
+    </section>
+
+  </main>
+
+</body>
+
+</html>

@@ -1,0 +1,230 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+section {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+input[type="email"],
+input[type="password"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input[type="submit"] {
+    margin-top: 20px;
+    padding: 12px;
+    background: #d62828;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background: #b71c1c;
+}
+
+.link-button {
+    display: inline-block;
+    margin-top: 15px;
+    text-decoration: none;
+    color: #d62828;
+}
+
+p {
+    text-align: center;
+}
+
+/* Page */
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(135deg, #f5f5f5, #ffecec);
+    color: #333;
+}
+
+section {
+    justify-content: center;
+    align-items: center;
+    padding: 40px 100px;
+}
+
+/* Card */
+.register-card {
+    width: 100%;
+    max-width: 550px;
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* Headings */
+.register-card h1 {
+    text-align: center;
+    color: #8b0000;
+    margin-bottom: 10px;
+}
+
+.register-card p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+/* Form */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.name-row {
+    display: flex;
+    gap: 15px;
+}
+
+.name-row div {
+    flex: 1;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+input:focus {
+    border-color: #8b0000;
+    outline: none;
+    box-shadow: 0 0 8px rgba(139,0,0,0.3);
+}
+
+/* Terms */
+.terms {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.terms a {
+    color: #8b0000;
+    text-decoration: none;
+}
+
+.terms a:hover {
+    text-decoration: underline;
+}
+
+/* Buttons */
+button {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #218838;
+}
+
+.login-btn {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    margin-top: 20px;
+    border: 2px solid #8b0000;
+    color: #8b0000;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.login-btn:hover {
+    background: #8b0000;
+    color: white;
+}
+
+/* Divider */
+.divider {
+    text-align: center;
+    margin: 30px 0;
+    color: #777;
+    position: relative;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 35%;
+    height: 1px;
+    background: #ccc;
+}
+
+.divider::before {
+    left: 0;
+}
+
+.divider::after {
+    right: 0;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .register-card {
+        padding: 25px;
+    }
+
+    .name-row {
+        flex-direction: column;
+    }
+}

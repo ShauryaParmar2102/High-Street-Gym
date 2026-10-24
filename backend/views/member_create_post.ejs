@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <%- include("partials/head.ejs") %>
+  <title>High Street Gym - Create Member Post</title>
+    </head>
+
+    <body class="bg-gray-50">
+
+<main class="w-full max-w-5xl mx-auto px-6 sm:px-8 py-6">
+
+
+
+  <form
+    action="/post/member"
+    method="post"
+    class="space-y-4 bg-white p-6 rounded-xl shadow-sm border border-gray-200 w-full max-w-3xl mx-auto"
+    style="padding: 30px; margin-top: 40px;"
+>
+
+    <input type="hidden" name="action" value="create">
+
+    <h1 class="text-3xl font-bold text-gray-900 mb-2 text-center">
+    Create New Post
+</h1>
+
+<p class="text-gray-600 mb-6 text-center">
+    Share a post with the High Street Gym community.
+</p>
+
+    <!-- TITLE -->
+    <div>
+        <label for="title" class="block font-medium">
+            Title:
+        </label>
+
+        <input
+            id="title"
+            type="text"
+            name="title"
+            required
+            maxlength="50"
+            class="w-full border border-gray-300 bg-white px-4 py-3 rounded-xl mt-1 focus:outline-none focus:ring-2 focus:ring-hsg-purple"
+        >
+    </div>
+
+    <!-- CONTENT -->
+    <div>
+        <label for="content" class="block font-medium">
+            Content:
+        </label>
+
+        <textarea
+            id="content"
+            name="content"
+            rows="6"
+            required
+            maxlength="2000"
+            class="w-full border border-gray-300 bg-white px-4 py-3 rounded-xl mt-1 focus:outline-none focus:ring-2 focus:ring-hsg-purple"
+        ></textarea>
+    </div>
+
+    <!-- ERROR MESSAGE -->
+    <% if (error) { %>
+        <div class="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded">
+            <%= error %>
+        </div>
+    <% } %>
+
+     <!-- BUTTONS -->
+      <div class="flex justify-center items-center gap-3 pt-2">
+
+         <a
+        href="/post/member"
+         class="inline-flex items-center justify-center bg-white text-hsg-purple border border-hsg-purple px-6 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-white transition"
+      >
+        Cancel
+      </a>
+
+      <button
+        type="submit"
+          class="inline-flex items-center justify-center bg-hsg-purple text-white border border-transparent px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition"
+      >
+        Create
+      </button>
+
+     
+
+    </div>
+
+  </form>
+
+</main>
+
+</body>
+</html>

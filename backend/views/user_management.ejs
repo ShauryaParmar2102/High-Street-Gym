@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <%- include("partials/head.ejs") %>
+        <title>User Management - High Street Gym</title>
+
+      
+
+    </head>
+
+    <body class="bg-gray-50 text-gray-900">
+
+      <%- include("partials/admin-navbar.ejs", { user: authenticatedUser }) %>
+      
+
+    <main class="w-full max-w-none mx-auto px-6 sm:px-8 py-10">
+
+         <!-- HEADER -->
+  <h1 class="text-3xl font-bold mb-2 text-center"> Manage Gym Users</h1>
+  <p class="text-gray-600 mb-6 text-center">  View and manage member, trainer, and administrator accounts.</p>
+
+
+  <!-- GRID -->
+  <section class="flex flex-col gap-8 w-full">
+
+<!-- Form for creating a new user or changing an existing user -->
+<div id="edit-user"
+    class="crud-form mb-6 bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+
+
+
+  <!-- Change the heading depending on whether a user is being edited -->
+  <h2 class="text-2xl font-semibold text-gray-900 mb-5 text-center"
+  
+  >
+    <%= selectedUser.id ? "Edit User Account" : "Add New User" %>
+  </h2>
+
+
+  <!-- Send the user information to the User Controller -->
+  <form
+    action="/user/<%= selectedUser.id || '' %>"
+    method="post"
+    class="space-y-5 w-full max-w-xl mx-auto px-4 sm:px-6"
+  >
+
+    <!-- Enter or change the user's first name -->
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-1">
+        First Name
+      </label>
+
+      <input
+        type="text"
+        name="firstName"
+        required
+        value="<%= selectedUser.firstName || '' %>"
+        class="w-full border border-gray-300 px-4 py-3 rounded-xl focus:outline-none"
+      >
+    </div>
+
+
+    <!-- Enter or change the user's last name -->
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-1">
+        Last Name
+      </label>
+
+      <input
+        type="text"
+        name="lastName"
+        required
+        value="<%= selectedUser.lastName || '' %>"
+        class="w-full border border-gray-300 px-4 py-2.5 rounded-xl
+               focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+    </div>
+
+
+    <!-- Select the User account type -->
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-1">
+        Account Role
+      </label>
+
+      <select
+        name="role"
+        required
+        class="w-full border border-gray-300 px-4 py-3 rounded-xl focus:outline-none"
+      >
+
+        <option
+          value="administrator"
+          <%= selectedUser.role === "administrator" ? "selected" : "" %>
+        >
+          Administrator
+        </option>
+
+        <option
+          value="member"
+          <%= selectedUser.role === "member" ? "selected" : "" %>
+        >
+          Member
+        </option>
+
+        <option
+          value="trainer"
+          <%= selectedUser.role === "trainer" ? "selected" : "" %>
+        >
+          Trainer
+        </option>
+
+      </select>
+    </div>
+
+    
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <input type="email" name="email" required
+                 value="<%= selectedUser.email || '' %>"
+                 class="w-full mt-1 border border-gray-300 p-2.5 rounded-lg
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+        </div>
+
+        <!-- Enter a password for the user's account -->
+        <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Password
+            </label>
+
+            <input
+                type="password"
+                name="password"
+                minlength="6"
+                placeholder="Enter a password"
+                class="w-full border border-gray-300 px-4 py-2.5 rounded-xl
+                    focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+        </div>
+
+           <div class="flex justify-center items-center gap-4 mt-6 mb-6">
+
+<% if (!selectedUser.id) { %>
+
+    <!-- Create a new user account -->
+    <button
+        type="submit"
+        name="action"
+        value="create"
+        class="px-6 py-3 bg-hsg-purple text-white rounded-xl font-semibold"
+    >
+        Create User
+    </button>
+
+        <!-- Clear the information entered into the form -->
+        <button
+            type="reset"
+            class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+        >
+            Clear
+        </button>
+
+    <% } else { %>
+
+                <!-- Save changes made to the selected user -->
+                <button
+                    type="submit"
+                    name="action"
+                    value="update"
+                    class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+
+                >
+                    Save Changes
+                </button>
+
+
+                <!-- Delete the selected user account -->
+                <button
+                    type="submit"
+                    name="action"
+                    value="delete"
+                    class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+                >
+                    Delete User
+                </button>
+
+            <% } %>
+
+               </div>
+
+</form>
+
+</div>
+
+    <!-- USER LIST  -->
+    <div id="user-list" class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 sm:p-6 overflow-x-auto">
+
+      <h2 class="text-2xl font-semibold text-gray-900 mb-5 text-center">
+  Registered Users
+</h2>
+
+      <!-- Form used to search users and filter them by their account role -->
+      <form method="GET" action="/user#user-list"
+      class="hsg-user-filters mb-6 px-4 sm:px-6">
+
+
+           <!-- Enter a user's name or email to find their account -->
+        <input type="text"
+            name="search"
+            placeholder="Enter a name or email..."
+            value="<%= search || '' %>"
+            class="w-full md:w-64 md:flex-none px-4 py-3 border border-gray-300 rounded-xl shadow-sm
+       focus:outline-none focus:ring-2 focus:ring-blue-500"
+>
+               <!-- Choose which type of user account to display -->
+         <select name="role"
+                     class="w-full md:w-64 md:flex-none px-4 py-3 border border-gray-300 rounded-xl shadow-sm
+       focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+          <option value="">All Roles</option>
+          <option value="administrator" <%= roleFilter === "administrator" ? "selected" : "" %>>administrator</option>
+          <option value="trainer" <%= roleFilter === "trainer" ? "selected" : "" %>>Trainer</option>
+          <option value="member" <%= roleFilter === "member" ? "selected" : "" %>>Member</option>
+        </select>
+
+        <!-- Submit the selected search and role filter -->
+        <div class="flex flex-row justify-center items-center gap-3 w-full md:w-auto">
+        
+        <button type="submit"
+                 class=" w-auto px-6 py-3 bg-hsg-purple text-white rounded-xl font-semibold hover:opacity-90 transition">
+          Search
+        </button>
+
+        
+
+        <!-- Clear the current search and filters -->
+        <a
+            href="/user#user-list"
+            class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+        > Reset Filters</a>
+        </div>
+        </form>
+
+<!-- Headings for the user list -->
+<div class="user-columns user-headings bg-gray-100 rounded-lg px-4 py-3 mb-3">
+
+    <span>User Name</span>
+    <span>User Role</span>
+    <span>Email Address</span>
+    <span class="text-center">Actions</span>
+
+</div>
+
+<!-- Display each registered user -->
+<% for (const user of users) { %>
+
+     <div class="user-columns
+            px-4 py-4 mb-3 mx-2 sm:mx-4
+            bg-white border border-gray-200 rounded-lg
+            shadow-sm hover:shadow-md hover:bg-gray-50
+            transition">
+
+        <!-- USER NAME -->
+        <span class="font-semibold text-gray-900">
+            <%= user.firstName %> <%= user.lastName %>
+        </span>
+
+        <!-- USER ROLE -->
+        <span>
+            <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full
+                <%= user.role === 'administrator' ? 'bg-red-100 text-red-700' : '' %>
+                <%= user.role === 'trainer' ? 'bg-green-100 text-green-700' : '' %>
+                <%= user.role === 'member' ? 'bg-blue-100 text-blue-700' : '' %>">
+
+                <%= user.role %>
+
+            </span>
+        </span>
+
+        <!-- EMAIL ADDRESS -->
+        <span class="text-sm text-gray-600 break-all min-w-0">
+
+            <%= user.email %>
+        </span>
+
+        <!-- EDIT BUTTON -->
+        <span class="user-actions">
+
+        <a href="/user/<%= user.id %>#edit-user"
+          class="inline-block px-4 py-2
+                  bg-anytime-purple text-white text-sm font-medium
+                  rounded-xl hover:bg-purple-700
+                  shadow-sm transition ">
+            Edit
+        </a>
+
+        </span>
+
+    </div>
+
+<% } %>
+
+    </div>
+
+   
+
+  </section>
+
+</main>
+
+<%- include("partials/footer.ejs") %>
+
+<style>
+
+</style>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@source inline("w-28 w-32 w-40 w-auto max-w-md max-w-2xl");
+@source inline("flex-row flex-wrap justify-between gap-2 gap-5 gap-6");
+@source inline("grid grid-cols-2");
+@source inline("sm:flex-row sm:w-auto md:flex-row");

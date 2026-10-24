@@ -1,0 +1,140 @@
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+>
+
+<header class="bg-anytime-navy shadow-sm"
+        style="position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="flex items-center justify-center py-2 px-2 relative">
+
+      <!-- Mobile hamburger menu button -->
+<button
+  type="button"
+  id="menu-button"
+  class="hamburger-button bg-transparent text-white text-3xl px-2 py-2 absolute -left-3"
+  aria-label="Open navigation menu"
+  aria-expanded="false"
+  aria-controls="mobile-menu"
+>
+  ☰
+</button>
+
+<!-- Brand -->
+<a
+  href="/authenticate/dashboard"
+  class="text-3xl font-bold uppercase text-white whitespace-nowrap"
+>
+  <span class="inline-flex items-center gap-1 whitespace-nowrap">
+  High Street Gym
+  <i class="fa-solid fa-dumbbell text-white"></i>
+</span>
+</a>
+
+      <!-- Navigation -->
+      <nav
+  id="mobile-menu"
+  class="mobile-nav gap-2 text-sm mx-auto md:absolute md:left-1/2 md:-translate-x-1/2"
+>
+
+         <!-- ADMINISTRATOR NAVIGATION -->
+        <% if (user && user.role === "administrator") { %>
+          <a href="/user"
+             class="px-4 py-2 rounded-md text-white font-medium">
+            Users
+          </a>
+
+          <a href="/session"
+            class="px-4 py-2 rounded-md text-white font-medium">
+            Sessions
+          </a>
+
+          <a href="/activity"
+             class="px-4 py-2 rounded-md text-white font-medium ">
+            Activities
+          </a>
+
+          <a href="/location"
+             class="px-4 py-2 rounded-md text-white font-medium ">
+            Locations
+          </a>
+
+          <a href="/post"
+             class="px-4 py-2 rounded-md text-white font-medium ">
+            Posts
+          </a>
+
+          <a href="/booking"
+             class="px-4 py-2 rounded-md text-white font-medium">
+            Bookings
+          </a>
+        <% } %>
+          <!-- TRAINER NAVIGATION -->
+        <% if (user && user.role === "trainer") { %>
+          <a href="/session/trainer/view"
+             class="px-4 py-2 rounded-md text-white font-medium">
+            My Sessions
+          </a>
+
+          <a href="/post/trainer"
+             class="px-4 py-2 rounded-md text-white font-medium">
+            Trainer Microblog
+          </a>
+        <% } %>
+          <!-- MEMBER NAVIGATION -->
+        <% if (user && user.role === "member") { %>
+          <a href="/session/member/view"
+            class="px-4 py-2 rounded-md text-white font-medium">
+            Session Timetable
+          </a>
+
+          <a href="/booking/member"
+             class="px-4 py-2 rounded-md text-white font-medium">
+            My Bookings
+          </a>
+
+          <a href="/post/member"
+             class="px-4 py-2 rounded-md text-white font-medium">
+            My Posts
+          </a>
+        <% } %>
+
+        <% if (user && ["administrator", "trainer", "member"].includes(user.role)) { %>
+          <a
+      href="/authenticate/logout"
+      style="background:white; color:black; padding:10px 16px; display:inline-block;"
+    >
+     Logout
+    </a>
+        <% } %>
+
+      </nav>
+    </div>
+  </div>
+</header>
+
+<div id="navbar-spacer"></div>
+
+<script>
+  const navbar = document.querySelector("header");
+  const spacer = document.getElementById("navbar-spacer");
+
+  function updateNavbarSpacing() {
+    spacer.style.height = `${navbar.offsetHeight}px`;
+  }
+
+  updateNavbarSpacing();
+  window.addEventListener("resize", updateNavbarSpacing);
+</script>
+
+<script>
+  const menuButton = document.getElementById("menu-button");
+  const mobileMenu = document.getElementById("mobile-menu");
+
+  menuButton.addEventListener("click", () => {
+    mobileMenu.classList.toggle("open");
+
+    const isOpen = mobileMenu.classList.contains("open");
+    menuButton.setAttribute("aria-expanded", isOpen);
+  });
+</script>

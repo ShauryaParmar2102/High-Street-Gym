@@ -1,0 +1,146 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>High Street Gym - Bookings</title>
+
+<link rel="stylesheet" href="/css/tailwind.css">
+
+<%- include("partials/admin-navbar.ejs") %>
+
+<main class="max-w-6xl mx-auto px-3 sm:px-4 pt-12 pb-6 md:pt-12 md:pb-8">
+
+<body class="bg-gray-50">
+
+  <h1 class="text-3xl font-bold text-gray-800 mb-6 mt-12 text-center">
+    My Bookings
+  </h1>
+
+  <p class="text-gray-600 mb-6 text-center">
+  View and manage your upcoming and previous gym session bookings.
+</p>
+
+<!-- MEMBER XML EXPORT -->
+<div class="flex justify-center mt-6 mb-12" style="margin-bottom: 20px;">
+
+  <a
+    href="/booking/member/export/xml"
+    class="inline-flex items-center px-4 py-3 bg-hsg-purple text-white rounded-xl font-semibold"
+  >
+    Export Previous Bookings XML
+  </a>
+
+</div>
+
+</div> <!-- Closes Export Previous Bookings box -->
+
+
+  <% if (!bookings || bookings.length === 0) { %>
+
+    <!-- No bookings -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 text-center text-gray-500">
+      You don't have any bookings yet.
+    </div>
+
+  <% } else { %>
+
+    <!-- BOOKING LIST HEADING -->
+    <div class="bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 font-semibold text-gray-700"
+        style="background-color: #f3f4f6; margin-bottom: 20px; padding: 16px;">
+      My Session Bookings
+    </div>
+
+    <!-- Booking list -->
+    <div class="space-y-5" style="display: flex; flex-direction: column; gap: 16px;">
+
+      <% bookings.forEach(function(b) { 
+          const s = b.session;
+      %>
+
+        <!-- Booking card -->
+        <div class="bg-white border border-gray-200 shadow-sm rounded-xl p-4 md:p-5"
+     style="padding: 20px; margin-bottom: 20px;">
+
+          <p class="text-sm text-gray-500">
+            Booked on
+            <%= b?.bookedAt
+              ? new Date(b.bookedAt).toLocaleDateString("en-AU")
+              : "-"
+            %>
+          </p>
+
+          <h2 class="text-xl font-bold text-blue-700 mt-2">
+            <%= s?.activity?.name || "Unknown Activity" %>
+          </h2>
+
+          <div class="mt-4 space-y-2">
+
+            <p class="text-gray-600">
+              <span class="font-semibold text-gray-800"> 📍 Location:</span>
+              <%= s?.location?.name || "Unknown Location" %>
+            </p>
+
+            <p class="text-gray-600">
+              <span class="font-semibold text-gray-800"> 🏋️ Trainer:</span>
+              <%= s?.user?.firstName || "" %>
+              <%= s?.user?.lastName || "" %>
+            </p>
+
+              <p class="text-gray-600">
+    <span class="font-semibold text-gray-800">📆 Date of Session:</span>
+    <%= s?.session?.sessionDate
+      ? new Date(s.session.sessionDate).toLocaleDateString("en-AU")
+      : "Not available"
+    %>
+  </p>
+
+  <p class="text-gray-600">
+    <span class="font-semibold text-gray-800">🕐 Time:</span>
+    <%= s?.session?.startTime || "Not available" %>
+    -
+    <%= s?.session?.endTime || "Not available" %>
+  </p>
+
+          </div>
+
+
+          <!-- Cancel Booking -->
+          <form
+            method="POST"
+            action="/booking/member"
+            class="mt-5"
+          >
+
+            <input
+              type="hidden"
+              name="id"
+              value="<%= b.id %>"
+            >
+
+            <input
+              type="hidden"
+              name="action"
+              value="delete"
+            >
+
+            <button
+              type="submit"
+              class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+            >
+              Cancel Booking
+            </button>
+
+          </form>
+
+        </div>
+
+          </div>
+
+      <% }) %>
+
+       </div> 
+
+
+  <% } %>
+
+
+  </div>
+

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include("partials/head.ejs") %>
+  <title>Create Trainer Post - High Street Gym</title>
+</head>
+
+<body class="bg-gray-50">
+
+<main class="max-w-3xl mx-auto p-6"
+      style="padding: 40px 32px; box-sizing: border-box;">
+  
+<div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6"
+     style="padding: 30px;">
+
+    <h1 class="text-3xl font-bold text-gray-900 mb-2 text-center">
+      Create New Post
+    </h1>
+
+    <p class="text-gray-600 mb-6 text-center">
+      Share a post with the High Street Gym community.
+    </p>
+
+    <% if (error) { %>
+      <div class="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded mb-4">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <form action="/post/trainer" method="post" class="space-y-4">
+
+      <!-- Tell the controller to create a new post -->
+      <input type="hidden" name="action" value="create">
+
+      <div>
+        <label for="title" class="block font-medium mb-1">
+          Title
+        </label>
+
+        <input
+          id="title"
+          type="text"
+          name="title"
+          required
+          class="w-full border border-gray-300 p-2 rounded-lg"
+        >
+      </div>
+
+      <div>
+        <label for="content" class="block font-medium mb-1">
+          Content
+        </label>
+
+        <textarea
+          id="content"
+          name="content"
+          rows="6"
+          required
+          class="w-full border border-gray-300 p-2 rounded-lg"
+        ></textarea>
+      </div>
+
+      <div class="w-full flex justify-center items-center gap-4 pt-4"
+      style="margin-top: 20px; margin-bottom: 16px;">
+
+      <a
+        href="/post/trainer"
+        class="w-32 text-center bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+      >
+        Cancel
+      </a>
+
+      <button
+        type="submit"
+        class="w-32 text-center bg-hsg-purple text-white px-4 py-3 rounded-xl font-semibold hover:opacity-90 transition"
+      >
+        Create
+      </button>
+
+          </div> <!-- Closes button container -->
+
+    </form>
+
+  </div>
+
+</main>
+
+</body>
+</html>

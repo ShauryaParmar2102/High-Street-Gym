@@ -1,0 +1,848 @@
+openapi: 3.0.0
+info:
+  title: High Street Gym API
+  version: 1.0.0
+  description: JSON REST API for interacting with the backend of High Street Gym
+servers:
+  - url: http://localhost:8080/api
+    description: Local development server
+  
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: Authentication-Key
+  schemas:
+    UserCredentials:
+      type: object
+      required:
+      - email
+      - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: your@gmail.com.au
+        password:
+          type: string
+          example: abc123
+    AuthenticationKey:
+      type: object
+      required:
+      - authenticationKey
+      properties:
+        authenticationKey:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        role:
+          type: string
+          enum:
+          - administrator
+          - trainer
+          - member
+          example: member
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-06-06T14:30:00Z'
+    Session:
+      type: object
+      properties:
+        session_id:
+          type: integer
+          example: 1
+        activity_name:
+          type: string
+          example: Yoga
+        location_name:
+          type: string
+          example: Westlake
+        trainer_name:
+          type: string
+          example: John Smith
+        session_date:
+          type: string
+          format: date
+          example: '2026-06-06'
+        start_time:
+          type: string
+          example: 09:58:00
+        end_time:
+          type: string
+          example: '11:58:00'
+        capacity:
+          type: integer
+          example: 20
+        isExpired:
+          type: boolean
+          example: false
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 30
+        session_id:
+          type: integer
+          example: 63
+        user_id:
+          type: integer
+          example: 5
+        created:
+          type: string
+          format: date-time
+          example: '2026-06-06T14:30:00Z'
+        activity_name:
+          type: string
+          example: Yoga
+        location_name:
+          type: string
+          example: Westlake
+        trainer_name:
+          type: string
+          example: John Smith
+        date:
+          type: string
+          format: date
+          example: '2026-06-06'
+        start_time:
+          type: string
+          example: 09:58:00
+        end_time:
+          type: string
+          example: '11:58:00'
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: My first post
+        content:
+          type: string
+          example: This is my first post.
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Unauthorized request
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+                example: /api/bookings
+              message:
+                type: string
+                example: Please authenticate to access the requested resource
+paths:
+  /authenticate:
+    post:
+      summary: Authenticate a user
+      description: Log in a user using their email and password and return an authentication
+        key.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationKey'
+        '401':
+          description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to authenticate user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Log out the authenticated user
+      description: Removes the authentication key from the logged-in user.
+      security:
+        - ApiKey: []
+      responses:
+        '200':
+          description: User logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Not Authenticated
+        '401':
+          description: User is not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to deauthenticate user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions:
+    get:
+      summary: Get all gym sessions
+      description: Retrieves all gym sessions and returns them as JSON.
+      security: []
+      parameters:
+      - name: filter
+        in: query
+        required: false
+        description: Optional session search or filter value.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Sessions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+        '500':
+          description: Failed to load sessions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Create a trainer session
+      security:
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - activityId
+                - locationId
+                - date
+                - startTime
+                - endTime
+                - capacity
+              properties:
+                activityId:
+                  type: integer
+                locationId:
+                  type: integer
+                date:
+                  type: string
+                  format: date
+                startTime:
+                  type: string
+                endTime:
+                  type: string
+                capacity:
+                  type: integer
+                  minimum: 1
+      responses:
+        '201':
+          description: Session created successfully
+        '400':
+          description: Invalid session details
+        '409':
+          description: Duplicate session
+        '500':
+          description: Failed to create session
+  /sessions/xml:
+    get:
+      summary: Export all gym sessions as XML
+      description: Retrieves all gym sessions and returns them as an XML document.
+      security:
+        - ApiKey: []
+      responses:
+        '200':
+          description: Sessions exported as XML
+          content:
+            application/xml:
+              schema:
+                type: string
+        '500':
+          description: Failed to generate XML
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions/trainer:
+    get:
+      summary: Get sessions for a trainer
+      description: Retrieves all sessions belonging to a specific trainer.
+      security:
+        - ApiKey: []
+      responses:
+        '200':
+          description: Trainer sessions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+        '400':
+          description: Invalid trainer ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to load trainer sessions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'#
+
+  /sessions/activities:
+    get:
+      summary: Get all activities
+      security:
+        - ApiKey: []
+      responses:
+        '200':
+          description: List of activities
+
+  /sessions/locations:
+    get:
+      summary: Get all locations
+      security:
+        - ApiKey: []
+      responses:
+        '200':
+          description: List of locations
+          
+  /sessions/{id}:
+    put:
+      summary: Update a trainer session
+      security:
+        - ApiKey: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - date
+                - startTime
+                - endTime
+                - capacity
+                - activityId
+                - locationId
+              properties:
+                date:
+                  type: string
+                  format: date
+                startTime:
+                  type: string
+                endTime:
+                  type: string
+                capacity:
+                  type: integer
+                  minimum: 1
+                activityId:
+                  type: integer
+                  minimum: 1
+                locationId:
+                  type: integer
+                  minimum: 1
+      responses:
+        '200':
+          description: Session updated successfully
+        '400':
+          description: Invalid session details
+        '403':
+          description: Permission denied
+        '404':
+          description: Session not found
+        '500':
+          description: Failed to update session
+
+    delete:
+      summary: Delete a session
+      description: Deletes a session using its session ID.
+      security:
+        - ApiKey: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Session ID
+        schema:
+          type: integer
+        example: 63
+      responses:
+        '200':
+          description: Session deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Session deleted successfully
+        '500':
+          description: Failed to delete session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /users:
+    post:
+      summary: Create a new member
+      description: Creates a new member account.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: member@example.com
+                password:
+                  type: string
+                  example: abc123
+                firstName:
+                  type: string
+                  example: John
+                lastName:
+                  type: string
+                  example: Smith
+      responses:
+        '201':
+          description: Member created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 10
+                  message:
+                    type: string
+                    example: member created successfully
+        '400':
+          description: Email and password are required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to create user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /users/self:
+    get:
+      summary: Get the authenticated user's details
+      description: Retrieves information about the currently logged-in user.
+      security:
+        - ApiKey: []
+      responses:
+        '200':
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: User is not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /users/{id}:
+    get:
+      summary: Get a user by ID
+      description: Retrieves a specific user's information.
+      security:
+        - ApiKey: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: User ID
+        schema:
+          type: integer
+        example: 5
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid user ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: User does not have permission to view this user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      summary: Update a user's personal information
+      description: Updates the authenticated user's personal information.
+      security:
+        - ApiKey: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: User ID
+        schema:
+          type: integer
+        example: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  example: John
+                lastName:
+                  type: string
+                  example: Smith
+                email:
+                  type: string
+                  format: email
+                  example: john@example.com
+                password:
+                  type: string
+                  example: newpassword123
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User updated successfully
+        '403':
+          description: User is not allowed to update this account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to update user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /posts:
+    get:
+      summary: Get all community posts
+      description: Retrieves all community posts.
+      security: []
+      responses:
+        '200':
+          description: Posts retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    post:
+      summary: Create a new community post
+      description: Creates a new post for a member or trainer.
+      security:
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - post
+              properties:
+                post:
+                  type: object
+                  required:
+                  - title
+                  - content
+                  properties:
+                    title:
+                      type: string
+                      example: My first post
+                    content:
+                      type: string
+                      example: This is my first post.
+      responses:
+        '201':
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                    example: Post created.
+        '401':
+          description: User is not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to create post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /posts/{id}:
+    get:
+      summary: Get a specific post by ID
+      description: Retrieves a specific post using its ID.
+      security:
+        - ApiKey: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Post ID
+        schema:
+          type: integer
+        example: 1
+      responses:
+        '200':
+          description: Post retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Invalid post ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete a specific post by ID
+      description: Deletes a specific post using its ID.
+      security:
+        - ApiKey: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Post ID
+        schema:
+          type: integer
+        example: 1
+      responses:
+        '200':
+          description: Post deleted successfully
+        '400':
+          description: Invalid post ID
+        '403':
+          description: User does not have permission to delete the post
+        '404':
+          description: Post not found
+  /bookings:
+    get:
+      summary: Get the logged-in user's bookings
+      description: Retrieves all bookings belonging to the authenticated user.
+      security:
+        - ApiKey: []
+      responses:
+        '200':
+          description: Bookings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+        '500':
+          description: Failed to load bookings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Create a new booking
+      description: Creates a booking for the authenticated user.
+      security:
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - sessionId
+              properties:
+                sessionId:
+                  type: integer
+                  example: 63
+      responses:
+        '200':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 30
+                  message:
+                    type: string
+                    example: booking created
+        '500':
+          description: Failed to create booking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /bookings/{id}:
+    delete:
+      summary: Cancel a booking
+      description: Deletes a booking using its ID.
+      security:
+        - ApiKey: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Booking ID
+        schema:
+          type: integer
+        example: 30
+      responses:
+        '200':
+          description: Booking cancelled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: booking cancelled successfully
+        '400':
+          description: Invalid booking ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to cancel booking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /bookings/xml:
+    get:
+      summary: Export the logged-in user's bookings as XML
+      description: Exports the authenticated user's bookings as XML.
+      security:
+        - ApiKey: []
+      responses:
+        '200':
+          description: Booking XML export
+          content:
+            text/xml:
+              schema:
+                type: string
+        '500':
+          description: Failed to export bookings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

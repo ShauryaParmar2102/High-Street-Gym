@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High Street Gym Login</title>
+
+    <link rel="stylesheet" href="/css/tailwind.css">
+</head>
+
+<body class="bg-gray-50">
+
+    <main class="min-h-screen flex items-center justify-center px-4">
+
+        <section class="w-full max-w-lg bg-white p-8 rounded-xl shadow-lg">
+
+            <h1 class="text-3xl font-bold text-center mb-6">
+                Welcome Back
+            </h1>
+
+            <p class="text-center text-gray-500 mb-6">
+                Sign in to your High Street Gym account
+            </p>
+
+            <% if (registered) { %>
+                <p class="mb-4 rounded-lg bg-green-100 p-3 text-green-700">
+                    Registration successful! Please log in.
+                </p>
+            <% } %>
+
+            <% if (logout) { %>
+                <p class="mb-4 rounded-lg bg-blue-100 p-3 text-blue-700 text-center">
+                    You have been logged out successfully.
+                </p>
+            <% } %>
+
+            <form action="/authenticate" method="post" class="space-y-5">
+
+                <div>
+                    <label
+                        for="email"
+                        class="block mb-2 font-semibold"
+                    >
+                        Email:
+                    </label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        required
+                        autocomplete="email"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-3"
+                    >
+                </div>
+
+                <div>
+                    <label
+                        for="password"
+                        class="block mb-2 font-semibold"
+                    >
+                        Password:
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        required
+                        autocomplete="current-password"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-3"
+                    >
+                </div>
+
+                <button
+                type="submit"
+                class="block w-full bg-hsg-purple text-white px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+            >
+                Login
+            </button>
+
+            </form>
+
+            <div class="text-center" style="margin-top: 1rem;">
+
+            <a
+                href="/session/view"
+                class="inline-block w-full bg-hsg-white text-hsg-purple border border-hsg-purple px-5 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+            >
+                View Session Timetable
+            </a>
+        </div>
+
+       
+            <div class="text-center" style="margin-top: 1rem;">
+                <a
+                    href="/authenticate/register"
+                    class="block w-full bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition"
+                >
+                    Create Account
+                </a>
+            </p>
+            </div>
+
+            <!-- Public community blog link -->
+            <div class="text-center mt-4">
+                <a
+                    href="/post/public"
+                    class="text-purple-600 font-semibold hover:underline"
+                >
+                    View Community Blog
+                </a>
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+<bookingHistory>
+
+    <member>
+        <name><%= member.firstName %> <%= member.lastName %></name>
+    </member>
+
+    <exportDate><%= date %></exportDate>
+
+    <bookings>
+        <% bookings.forEach((booking) => { %>
+
+        <booking>
+            <bookingId><%= booking.id %></bookingId>
+            <activity><%= booking.session?.activity?.name || "N/A" %></activity>
+            <memberId><%= booking.memberId %></memberId>
+            <sessionId><%= booking.sessionId %></sessionId>
+
+<sessionDate><%= booking.session?.session?.sessionDate
+    ? new Date(booking.session.session.sessionDate).toISOString().split("T")[0]
+    : "N/A" %></sessionDate>
+
+    <startTime><%= booking.session?.session?.startTime || "N/A" %></startTime>
+<endTime><%= booking.session?.session?.endTime || "N/A" %></endTime>
+
+<bookingStatus><%= booking.bookingStatus %></bookingStatus>
+            <bookingDate><%= booking.bookedAt ? new Date(booking.bookedAt).toISOString().split("T")[0] : "" %></bookingDate>
+        </booking>
+
+        <% }) %>
+    </bookings>
+
+</bookingHistory>

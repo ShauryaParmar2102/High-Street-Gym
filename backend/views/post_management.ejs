@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+    <head>
+  <%- include("partials/head.ejs") %>
+  <title>High Street Gym - Post Management</title>
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+
+  <%- include("partials/admin-navbar.ejs", { user: authenticatedUser }) %>
+
+<main class="w-full max-w-5xl mx-auto px-6 sm:px-8 py-6">
+
+  
+
+  <!-- PAGE HEADER -->
+<div class="mb-8 text-center">
+
+  <h1 class="text-3xl font-bold text-gray-900 mb-2">
+    Manage Community Posts
+  </h1>
+
+  
+
+  <p class="text-gray-600">
+    Create, search, and manage posts shared by High Street Gym members.
+  </p>
+
+</div>
+
+ <!-- ================= CREATE FORM ================= -->
+    <div class="crud-form mb-8 bg-white border border-gray-200 shadow-sm rounded-xl p-6">
+
+      <h2 class="text-xl font-bold mb-4 text-center">Create Post</h2>
+
+      <form action="/post" method="post" class="space-y-4 w-full max-w-xl mx-auto px-4 sm:px-6">
+
+        <!-- TITLE -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Title</label>
+
+          <input type="text"
+                name="title"
+                required
+                class="w-full mt-1 border border-gray-300 p-2.5 rounded-lg bg-white
+                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+
+          <% if (error) { %>
+            <p class="text-red-500 text-sm mt-1"><%= error %></p>
+          <% } %>
+        </div>
+
+        <!-- CONTENT -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Content</label>
+
+          <textarea name="content"
+                    rows="4"
+                    class="w-full mt-1 border border-gray-300 p-2.5 rounded-lg bg-white
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"></textarea>
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="flex justify-center gap-4 pt-2" style="margin-top: 10px; margin-bottom: 20px;">
+
+         
+
+          <button type="submit"
+                  name="action"
+                  value="create"
+                  class="px-6 py-3 bg-hsg-purple text-white rounded-xl font-semibold">
+            Create
+          </button>
+
+
+           <button type="reset"
+                  class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition">
+            Clear
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+   <!-- GRID -->
+  <section class="flex flex-col gap-6">
+
+    <!-- ================= POST LIST ================= -->
+    <div class="bg-white border border-gray-200 shadow-sm rounded-xl p-4 sm:p-6 overflow-x-auto">
+
+      <h2 class="text-xl font-bold mb-4 text-center">Posts</h2>
+
+     <!-- SEARCH -->
+<form method="GET" action="/post"
+      class="post-filter-form mb-4">
+
+    <!-- Search posts -->
+    <input
+        type="text"
+        name="search"
+        placeholder="Search title or content..."
+        value="<%= search || '' %>"
+        class="border border-gray-300 px-4 py-3 rounded-xl bg-white focus:outline-none"
+    >
+
+    <!-- Search button -->
+    <button
+        type="submit"
+        class="px-6 py-3 bg-hsg-purple text-white rounded-xl font-semibold">
+        Search
+    </button>
+
+    <!-- Clear filters -->
+    <a
+        href="/post"
+        class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition">
+        Clear
+    </a>
+
+</form>
+
+        <!-- POST LIST -->
+<div class="bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 mb-3 mx-2 sm:mx-4 font-semibold text-gray-700" style="background-color: #f3f4f6; margin-bottom: 10px;">
+    Community Posts
+</div>
+
+<!-- POST LIST -->
+<% if (posts && posts.length) { %>
+
+    <% for (const post of posts) { %>
+
+        <div class="bg-white border border-gray-200 rounded-xl
+    shadow-sm p-5 mb-4 mx-2 sm:mx-4 hover:shadow-md transition" style="padding: 20px;">
+
+            <!-- AUTHOR -->
+<p class="text-sm font-semibold text-blue-600 mb-2">
+    <%= post.firstName %> <%= post.lastName %>
+</p>
+
+<!-- DIVIDER -->
+<hr class="border-0 border-t border-gray-200 my-4">
+
+<!-- TITLE -->
+<h3 class="text-lg font-semibold text-gray-900 break-words">
+    <%= post.title %>
+</h3>
+
+<!-- CONTENT -->
+<p class="text-gray-600 text-sm mt-3 leading-relaxed break-words">
+    <%= post.content %>
+</p>
+
+<!-- DATE -->
+<% if (post.createdAt) { %>
+    <div class="mt-4 text-xs text-gray-400">
+        Posted:
+        <%= new Date(post.createdAt).toLocaleDateString("en-AU") %>
+    </div>
+<% } %>
+
+            <!-- DELETE -->
+            <form action="/post" method="post">
+                <input type="hidden" name="id" value="<%= post.id %>">
+
+                <button type="submit"
+                        name="action"
+                        value="delete"
+                        class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition">
+                    Delete
+                </button>
+            </form>
+
+        </div>
+
+    <% } %>
+
+<% } else { %>
+
+    <p class="text-gray-500">
+        No posts found.
+    </p>
+
+<% } %>
+
+    
+
+     </div> <!-- Closes Posts list container -->
+</section>
+
+<%- include("partials/footer.ejs") %>
+
+</main>
+
+</body>
+</html>

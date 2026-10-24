@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <%-include("partials/head.ejs") %>
+    </head>
+
+    <body class="bg-gray-50 text-gray-900">
+
+      <%- include("partials/admin-navbar.ejs", { user: authenticatedUser }) %>
+
+    <main class="w-full max-w-5xl mx-auto px-6 sm:px-8 py-6">
+
+        
+  <!-- HEADER -->
+  <h1 class="text-3xl font-bold mb-2 text-center">Activity Management</h1>
+  <p class="text-gray-600 mb-6 text-center">
+    Create, edit, and manage activities
+  </p>
+
+
+    <!-- GRID -->
+  <section class="flex flex-col gap-8">
+    
+
+    <!--CREATE/EDIT FORM-->
+    <div id="edit-activity"
+     class="crud-form bg-white border border-gray-200 shadow-sm rounded-xl p-6"
+     style="margin-bottom: 32px;">
+
+         <% const isEdit = selectedActivity && selectedActivity.id; %>
+
+      <h2 class="text-xl font-bold mb-4 text-center">
+        <%= isEdit ? "Edit Activity" : "Create Activity" %>
+      </h2>
+
+      
+      <form action="/activity/<%= isEdit ? selectedActivity.id : '' %>"
+            method="post"
+            class="space-y-4 w-full max-w-xl mx-auto px-4 sm:px-6">
+
+        <!-- ACTIVITY NAME -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">
+            Activity Name
+          </label>
+
+          <input
+            type="text"
+            name="name"
+            required
+            value="<%= selectedActivity ? selectedActivity.name : '' %>"
+            class="w-full mt-1 border border-gray-300 px-4 py-3 rounded-xl bg-white focus:outline-none">
+
+  
+                 
+        </div>
+
+         <!-- ACTIVITY DESCRIPTION -->
+<div>
+  <label class="block text-sm font-medium text-gray-700">
+    Activity Description
+  </label>
+
+  <textarea
+    name="description"
+    rows="3"
+    class="w-full mt-1 border border-gray-300 px-4 py-3 rounded-xl bg-white focus:outline-none"><%= selectedActivity ? selectedActivity.description : '' %></textarea>
+
+  <% if (error) { %>
+    <p class="text-red-600 text-sm mt-1" style="color: red;">
+      <%= error %>
+    </p>
+  <% } %>
+</div>
+      
+
+         <!-- BUTTONS -->
+<div class="flex justify-center gap-3 pt-4 pb-10" style="margin-bottom: 20px;">
+
+    <% if (!isEdit) { %>
+
+        <!-- Create a new activity -->
+        <button
+            type="submit"
+            name="action"
+            value="create"
+            class="px-6 py-3 bg-hsg-purple text-white rounded-xl font-semibold">
+            Create
+        </button>
+
+        <button
+            type="reset"
+            class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition">
+            Clear
+        </button>
+
+    <% } else { %>
+
+        <!-- Update the selected activity -->
+        <button
+            type="submit"
+            name="action"
+            value="update"
+            class="px-6 py-3 bg-hsg-purple text-white rounded-xl font-semibold">
+            Update
+        </button>
+
+        <!-- Delete the selected activity -->
+        <button
+            type="submit"
+            name="action"
+            value="delete"
+            class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition">
+            Delete
+        </button>
+
+        <button
+            type="reset"
+            class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition">
+            Clear
+        </button>
+
+    <% } %>
+
+</div>
+
+      </form>
+
+    </div>
+
+     <!-- ================= ACTIVITY LIST ================= -->
+    <div class="bg-white border border-gray-200 shadow-sm rounded-xl p-4 sm:p-6 overflow-x-auto">
+
+      <h2 class="text-xl font-bold mb-4 text-center">Activities</h2>
+
+<!-- SEARCH -->
+<form method="GET" action="/activity"
+      class="activity-filter-form mb-4">
+
+    <!-- Search activities -->
+    <input
+        type="text"
+        name="search"
+        placeholder="Search activities..."
+        value="<%= search || '' %>"
+        class="border border-gray-300 px-4 py-3 rounded-xl bg-white focus:outline-none"
+    >
+
+    <!-- Search button -->
+    <button
+        type="submit"
+        class="px-6 py-3 bg-hsg-purple text-white rounded-xl font-semibold">
+        Search
+    </button>
+
+    <!-- Clear filters -->
+    <a
+        href="/activity"
+        class="bg-hsg-white text-hsg-purple border border-hsg-purple px-4 py-3 rounded-xl font-semibold hover:bg-hsg-purple hover:text-hsg-white transition">
+        Clear
+    </a>
+
+</form>
+
+     
+
+      <!-- ACTIVITY LIST -->
+       <% if (activities && activities.length) { %>
+
+<div class="activity-header px-4 py-3 mx-2 sm:mx-4 bg-gray-100 rounded-lg mb-3 font-semibold text-gray-700">
+
+    <span>Activity Name</span>
+    <span>Description</span>
+    <span>Actions</span>
+</div>
+
+<% for (const activity of activities) { %>
+
+          <div class="activity-row px-4 py-4 mb-3 mx-2 sm:mx-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-gray-50 transition">
+
+
+    <!-- Activity Name -->
+<div class="font-semibold text-gray-900">
+    <%= activity.name %>
+</div>
+
+<!-- Description -->
+<div class="text-sm text-gray-600 break-words">
+    <span class="md:hidden font-semibold"> </span>
+    <%= activity.description || "No description" %>
+</div>
+
+    <!-- Manage Activity -->
+    <div class="flex justify-start md:justify-start">
+        <a
+            href="/activity/<%= activity.id %>#edit-activity"
+            class="inline-block px-4 py-3 bg-hsg-purple text-white text-sm font-semibold rounded-xl">
+            Edit
+        </a>
+    </div>
+</div>
+
+        <% } %>
+
+      <% } else { %>
+
+        <p class="text-gray-500 mt-4">
+          No activities found.
+        </p>
+
+     <% } %> 
+
+    </div>
+
+    
+
+  </section>
+
+  <!--FOOTER-->
+    <%- include("partials/footer.ejs") %>
+
+</main>
+
+    </body>
+</html>

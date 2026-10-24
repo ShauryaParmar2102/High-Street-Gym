@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include("partials/head.ejs") %>
+    <title>High Street Gym - Status</title>
+</head>
+
+<body class="bg-hsg-background min-h-screen">
+    <main>
+
+        <section class="max-w-3xl mx-auto px-4 py-16">
+            <article class="bg-white border border-hsg-border rounded-xl p-8 text-center">
+
+                <h2 class="text-3xl font-bold text-hsg-text mb-4">
+                    <%= status %>
+                </h2>
+
+                <% if (message) { %>
+                    <div class="text-hsg-secondary text-lg leading-relaxed mb-6">
+                        <p><%= message %></p>
+                    </div>
+                <% } %>
+
+                <!-- Go back button -->
+                <div>
+                    <a href="<%= typeof returnUrl !== 'undefined' ? returnUrl : '/authenticate/dashboard' %>"
+                        class="inline-block bg-hsg-purple text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition">
+                        Go Back
+                    </a>
+                </div>
+
+            </article>
+        </section>
+
+    </main>
+</body>
+</html>

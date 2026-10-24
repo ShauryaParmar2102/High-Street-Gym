@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trainerSchedule>
+
+    <trainer>
+        <name><%= trainer.firstName %> <%= trainer.lastName %></name>
+    </trainer>
+
+    <week>
+    <startDate><%= new Date(startDate).toLocaleDateString("en-AU") %></startDate>
+    <endDate><%= new Date(endDate).toLocaleDateString("en-AU") %></endDate>
+</week>
+
+    <sessions>
+
+        <% sessions.forEach((item) => { %>
+
+            <session>
+                <sessionId><%= item.session.id %></sessionId>
+                <activity><%= item.activity.name %></activity>
+                <trainer><%= item.user.firstName %> <%= item.user.lastName %></trainer>
+                <location><%= item.location.name %></location>
+                <date><%= new Date(item.session.sessionDate).toLocaleDateString("en-AU") %></date>
+                <startTime><%= item.session.startTime %></startTime>
+                <endTime><%= item.session.endTime %></endTime>
+            </session>
+
+        <% }) %>
+
+    </sessions>
+
+</trainerSchedule>
