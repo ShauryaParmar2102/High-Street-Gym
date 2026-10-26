@@ -196,6 +196,8 @@ CREATE TABLE users (
     PRIMARY KEY (user_id)
 );
 
+```
+
 Account Registration
 
 Users must provide a valid email address when registering, such as example@gmail.com.
