@@ -366,11 +366,23 @@ Ensure the backend database connection uses the correct MySQL credentials and th
 After creating the tables, insert the sample gym activities using the SQL provided above. Users can register through the application, and administrators can manage user roles.
 
 **Important:** Do not upload real user information, password hashes, authentication keys or database credentials to GitHub.
+
+
 ### 5️⃣ Start the Application
 
-Start the Express backend using the start command defined in its `package.json`.
+#### ⚙️ Start the Backend
 
-Then start the React frontend:
+Open a terminal in the project root and navigate to the backend folder:
+
+```bash
+cd backend
+```
+
+Start the Express server using the script defined in `backend/package.json`.
+
+#### 🎨 Start the Frontend
+
+Open a second terminal in the project root:
 
 ```bash
 cd frontend
