@@ -214,10 +214,14 @@ High Street Gym allows users to register and access features based on their assi
 | Role | Permissions |
 |---|---|
 | 👤 Member | Browse gym sessions, make bookings and view personal bookings |
-
 | 🏋️ Trainer | View assigned sessions and manage sessions through authorised backend functionality |
-
 | 🔑 Administrator | Manage users, activities, locations, sessions and bookings |
+
+#### ⚙️ Managing User Roles
+
+Administrators can change a user's role to `member`, `trainer` or `administrator` through the admin interface.
+
+**🔒 Security Note:** Passwords should never be stored as plaintext. Use the application's registration functionality to ensure passwords are hashed correctly.
 
 #### ⚙️ Managing User Roles
 
