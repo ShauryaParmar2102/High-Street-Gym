@@ -394,13 +394,7 @@ I plan to continue maintaining and improving the application as a portfolio proj
 
 ## 👤 Author
 
-**Shaurya Parmar**
-
-🎓 Diploma of Web Development — TAFE Queensland
-
-💻 Aspiring Web Developer
-
-🔗 [GitHub Profile](https://github.com/ShauryaParmar2102)
+Made by **Shaurya Parmar**
 
 ---
 
