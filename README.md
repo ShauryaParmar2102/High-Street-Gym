@@ -334,7 +334,7 @@ You should see the following tables:
 
 Ensure the backend database connection uses the correct MySQL credentials and the database name `high_street_gym`.
 
-The tables will initially be empty. Create accounts and other records through the application, or import suitable sample data separately.
+After creating the tables, insert the sample gym activities using the SQL provided above. Users can register through the application, and administrators can manage user roles.
 
 **Important:** Do not upload real user information, password hashes, authentication keys or database credentials to GitHub.
 ### 5️⃣ Start the Application
