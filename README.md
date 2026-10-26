@@ -261,6 +261,22 @@ CREATE TABLE locations (
     address VARCHAR(255),
     PRIMARY KEY (location_id)
 );
+
+```
+
+**📍 To add new gym locations, run the following SQL:**
+
+```sql
+INSERT INTO locations (location_name, address)
+VALUES
+('Brisbane City', 'Brisbane, QLD'),
+('Chermside', 'Chermside, QLD'),
+('Graceville', 'Graceville, QLD'),
+('Strathpine', 'Strathpine, QLD'),
+('Aspley', 'Aspley, QLD'),
+('Southbank', 'South Brisbane, QLD');
+
+
 ```
 
 **Sessions Table**
