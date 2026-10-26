@@ -196,6 +196,14 @@ CREATE TABLE users (
     PRIMARY KEY (user_id)
 );
 
+Account Registration
+
+Users must provide a valid email address when registering, such as example@gmail.com.
+
+Each email address must be unique and cannot be registered more than once.
+
+New accounts are assigned the member role by default. Administrators can change user roles through the admin interface.
+
 **Creating User Accounts**
 
 High Street Gym supports three user roles: `member`, `trainer` and `administrator`.
