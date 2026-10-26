@@ -195,6 +195,21 @@ CREATE TABLE users (
     authentication_key VARCHAR(255) UNIQUE,
     PRIMARY KEY (user_id)
 );
+
+**Creating User Accounts**
+
+High Street Gym supports three user roles: `member`, `trainer` and `administrator`.
+
+To create a new member account, open the application and use the registration page.
+
+The application stores passwords as hashes rather than plaintext passwords.
+
+Trainer and administrator accounts require the appropriate role to be assigned through authorised user-management functionality.
+
+An administrator can manage user accounts and change a user's role to member, trainer or administrator through the admin interface.
+
+**Note:** Do not insert plaintext passwords directly into the database. Use the application's account creation functionality to ensure passwords are hashed correctly.
+
 ```
 
 **Activities Table**
@@ -211,8 +226,6 @@ CREATE TABLE activities (
 
 
 **To add new activities, run the following SQL:**
-
-**Adding Gym Activities**
 
 ```sql
 INSERT INTO activities (activity_name, description)
