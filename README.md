@@ -223,8 +223,6 @@ Administrators can change a user's role to `member`, `trainer` or `administrator
 
 **🔒 Security Note:** Passwords should never be stored as plaintext. Use the application's registration functionality to ensure passwords are hashed correctly.
 
-```
-
 **Activities Table**
 
 Stores the different gym activities.
