@@ -297,11 +297,32 @@ paths:
         - ApiKey: []
       responses:
         '200':
-          description: Sessions exported as XML
+          description: Sessions exported successfully as XML
           content:
             application/xml:
               schema:
-                type: string
+                type: object
+                xml:
+                  name: sessions
+                properties:
+                  session:
+                    type: array
+                    xml:
+                      wrapped: false
+                    items:
+                      type: object
+                      xml:
+                        name: session
+                      properties:
+                        session_id:
+                          type: integer
+                          example: 63
+                        activity_name:
+                          type: string
+                          example: Yoga
+                        location_name:
+                          type: string
+                          example: Westlake
         '500':
           description: Failed to generate XML
           content:
@@ -839,7 +860,26 @@ paths:
           content:
             text/xml:
               schema:
-                type: string
+                type: object
+                xml:
+                  name: bookingHistory
+              example: |
+                <bookingHistory>
+                  <member>
+                    <name>Nick Flynn</name>
+                  </member>
+                  <exportDate>2026-10-26</exportDate>
+                  <bookings>
+                    <booking>
+                      <trainer>Jin Sakai</trainer>
+                      <activity>Boxing</activity>
+                      <location>Brisbane City</location>
+                      <date>2026-10-17</date>
+                      <startTime>10:00</startTime>
+                      <endTime>12:00</endTime>
+                    </booking>
+                  </bookings>
+                </bookingHistory>
         '500':
           description: Failed to export bookings
           content:
