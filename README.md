@@ -10,6 +10,16 @@ The project features a **React frontend**, a **Node.js/Express backend**, and a 
 
 ---
 
+## 📋 Project Overview
+
+| | |
+|---|---|
+| 🏷️ **Project Name** | High Street Gym – Gym Management System |
+| 🧩 **Architecture** | React frontend communicating with a separate Node.js/Express REST API backend |
+| 🛠️ **Tech Stack** | React, Vite, JavaScript, Node.js, Express.js, MySQL, HTML5, Tailwind CSS, DaisyUI, EJS, Swagger/OpenAPI |
+
+---
+
 ## 🛠️ Technologies Used
 
 ### 🎨 Frontend
@@ -159,19 +169,237 @@ cd frontend
 npm install
 ```
 
-### 4️⃣ Configure the Database
+### 4️⃣ Database Setup
 
-Set up a local MySQL database using the project's required schema.
+High Street Gym uses **MySQL 8.0** to manage users, activities, locations, sessions, bookings and blog posts.
 
-Configure the backend database connection with your local credentials.
+### 1. Create the Database
 
-**Note:** Database setup details and required environment variables depend on the local configuration. Do not commit passwords or private credentials.
+Open MySQL Workbench and connect to your local MySQL server.
+
+Run the following SQL:
+
+```sql
+CREATE DATABASE IF NOT EXISTS high_street_gym;
+USE high_street_gym;
+```
+
+### 2. Create the Database Tables
+
+Execute the following SQL statements in MySQL Workbench to create the six required tables.
+
+**Users Table**
+
+Stores member, trainer and administrator accounts.
+
+```sql
+CREATE TABLE users (
+    user_id INT NOT NULL AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role ENUM('member', 'trainer', 'administrator')
+        NOT NULL DEFAULT 'member',
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    authentication_key VARCHAR(255) UNIQUE,
+    PRIMARY KEY (user_id)
+);
+
+```
+
+### 👤 Account Registration & User Roles
+
+High Street Gym allows users to register and access features based on their assigned role.
+
+#### 📧 Registration Requirements
+
+- Users must provide a valid email address, such as `example@gmail.com`.
+- Each email address must be unique.
+- Passwords are securely hashed before being stored in the database.
+- New accounts are automatically assigned the `member` role.
+
+#### 🛡️ User Roles
+
+| Role | Permissions |
+|---|---|
+| 👤 Member | Browse gym sessions, make bookings and view personal bookings |
+| 🏋️ Trainer | View assigned sessions and manage sessions through authorised backend functionality |
+| 🔑 Administrator | Manage users, activities, locations, sessions and bookings |
+
+#### ⚙️ Managing User Roles
+
+Administrators can change a user's role to `member`, `trainer` or `administrator` through the admin interface.
+
+**🔒 Security Note:** Passwords should never be stored as plaintext. Use the application's registration functionality to ensure passwords are hashed correctly.
+
+**Activities Table**
+
+Stores the different gym activities.
+
+```sql
+CREATE TABLE activities (
+    activity_id INT NOT NULL AUTO_INCREMENT,
+    activity_name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT,
+    PRIMARY KEY (activity_id)
+);
+
+```
+
+
+**To add new activities, run the following SQL:**
+
+```sql
+INSERT INTO activities (activity_name, description)
+VALUES
+('Pilates', 'A relaxing class focused on flexibility and balance.'),
+('Boxing', 'Develop fitness and boxing techniques.'),
+('Yoga', 'Improve flexibility, balance and relaxation.'),
+('HIIT', 'High-intensity exercises to improve fitness.');
+
+```
+
+**Locations Table**
+
+Stores gym locations and their addresses.
+
+```sql
+CREATE TABLE locations (
+    location_id INT NOT NULL AUTO_INCREMENT,
+    location_name VARCHAR(100) NOT NULL UNIQUE,
+    address VARCHAR(255),
+    PRIMARY KEY (location_id)
+);
+
+```
+
+**📍 To add new gym locations, run the following SQL:**
+
+```sql
+INSERT INTO locations (location_name, address)
+VALUES
+('Brisbane City', 'Brisbane, QLD'),
+('Chermside', 'Chermside, QLD'),
+('Graceville', 'Graceville, QLD'),
+('Strathpine', 'Strathpine, QLD'),
+('Aspley', 'Aspley, QLD'),
+('Southbank', 'South Brisbane, QLD');
+
+
+```
+
+**Sessions Table**
+
+Stores scheduled gym sessions, including trainers, locations and capacities.
+
+```sql
+CREATE TABLE sessions (
+    session_id INT NOT NULL AUTO_INCREMENT,
+    activity_id INT NOT NULL,
+    trainer_id INT NOT NULL,
+    location_id INT NOT NULL,
+    session_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    capacity INT NOT NULL DEFAULT 20,
+    PRIMARY KEY (session_id),
+    CONSTRAINT fk_sessions_activity
+        FOREIGN KEY (activity_id) REFERENCES activities(activity_id),
+    CONSTRAINT fk_sessions_trainer
+        FOREIGN KEY (trainer_id) REFERENCES users(user_id),
+    CONSTRAINT fk_sessions_location
+        FOREIGN KEY (location_id) REFERENCES locations(location_id)
+);
+```
+
+**Bookings Table**
+
+Stores bookings made by members for gym sessions.
+
+```sql
+CREATE TABLE bookings (
+    booking_id INT NOT NULL AUTO_INCREMENT,
+    member_id INT NOT NULL,
+    session_id INT NOT NULL,
+    booking_status ENUM('booked', 'cancelled')
+        NOT NULL DEFAULT 'booked',
+    booked_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (booking_id),
+    UNIQUE KEY unique_member_session (member_id, session_id),
+    CONSTRAINT fk_bookings_member
+        FOREIGN KEY (member_id) REFERENCES users(user_id),
+    CONSTRAINT fk_bookings_session
+        FOREIGN KEY (session_id) REFERENCES sessions(session_id)
+);
+```
+
+**Posts Table**
+
+Stores blog posts created by users.
+
+```sql
+CREATE TABLE posts (
+    post_id INT NOT NULL AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    title VARCHAR(255),
+    PRIMARY KEY (post_id),
+    CONSTRAINT fk_posts_user
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
+        ON DELETE CASCADE
+);
+```
+
+### 3. Verify the Tables
+
+After executing the SQL statements, run:
+
+```sql
+SHOW TABLES;
+```
+
+You should see the following tables:
+
+- `users`
+- `activities`
+- `locations`
+- `sessions`
+- `bookings`
+- `posts`
+
+### 4. Configure the Backend
+
+Ensure the backend database connection uses the correct MySQL credentials and the database name `high_street_gym`.
+
+After creating the tables, insert the sample gym activities using the SQL provided above. Users can register through the application, and administrators can manage user roles.
+
+**Important:** Do not upload real user information, password hashes, authentication keys or database credentials to GitHub.
+
+
 
 ### 5️⃣ Start the Application
 
-Start the Express backend using the start command defined in its `package.json`.
+#### ⚙️ Start the Backend
 
-Then start the React frontend:
+Open a terminal in the project root and run:
+
+```bash
+npm run -w backend dev
+```
+
+This starts the Express backend using Nodemon.
+
+The backend runs at:
+
+`http://localhost:8080`
+
+Make sure MySQL is running and the database connection is configured correctly.
+
+#### 🎨 Start the Frontend
+
+Open a second terminal in the project root and run:
 
 ```bash
 cd frontend
@@ -179,6 +407,7 @@ npm run dev
 ```
 
 Open the local URL displayed by Vite.
+
 
 ---
 
@@ -224,14 +453,4 @@ I plan to continue maintaining and improving the application as a portfolio proj
 
 ## 👤 Author
 
-**Shaurya Parmar**
-
-🎓 Diploma of Web Development — TAFE Queensland
-
-💻 Aspiring Web Developer
-
-🔗 [GitHub Profile](https://github.com/ShauryaParmar2102)
-
----
-
-⭐ *Thanks for checking out High Street Gym!*
+Made by **Shaurya Parmar**
