@@ -198,27 +198,32 @@ CREATE TABLE users (
 
 ```
 
-Account Registration
+### 👤 Account Registration & User Roles
 
-Users must provide a valid email address when registering, such as example@gmail.com.
+High Street Gym allows users to register and access features based on their assigned role.
 
-Each email address must be unique and cannot be registered more than once.
+#### 📧 Registration Requirements
 
-New accounts are assigned the member role by default. Administrators can change user roles through the admin interface.
+- Users must provide a valid email address, such as `example@gmail.com`.
+- Each email address must be unique.
+- Passwords are securely hashed before being stored in the database.
+- New accounts are automatically assigned the `member` role.
 
-**Creating User Accounts**
+#### 🛡️ User Roles
 
-High Street Gym supports three user roles: `member`, `trainer` and `administrator`.
+| Role | Permissions |
+|---|---|
+| 👤 Member | Browse gym sessions, make bookings and view personal bookings |
 
-To create a new member account, open the application and use the registration page.
+| 🏋️ Trainer | View assigned sessions and manage sessions through authorised backend functionality |
 
-The application stores passwords as hashes rather than plaintext passwords.
+| 🔑 Administrator | Manage users, activities, locations, sessions and bookings |
 
-Trainer and administrator accounts require the appropriate role to be assigned through authorised user-management functionality.
+#### ⚙️ Managing User Roles
 
-An administrator can manage user accounts and change a user's role to member, trainer or administrator through the admin interface.
+Administrators can change a user's role to `member`, `trainer` or `administrator` through the admin interface.
 
-**Note:** Do not insert plaintext passwords directly into the database. Use the application's account creation functionality to ensure passwords are hashed correctly.
+**🔒 Security Note:** Passwords should never be stored as plaintext. Use the application's registration functionality to ensure passwords are hashed correctly.
 
 ```
 
