@@ -403,7 +403,3 @@ I plan to continue maintaining and improving the application as a portfolio proj
 ## 👤 Author
 
 Made by **Shaurya Parmar**
-
----
-
-⭐ *Thanks for checking out High Street Gym!*
