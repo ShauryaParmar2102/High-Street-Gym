@@ -208,6 +208,20 @@ CREATE TABLE activities (
     description TEXT,
     PRIMARY KEY (activity_id)
 );
+
+
+**To add new activities, run the following SQL:**
+
+**Adding Gym Activities**
+
+```sql
+INSERT INTO activities (activity_name, description)
+VALUES
+('Pilates', 'A relaxing class focused on flexibility and balance.'),
+('Boxing', 'Develop fitness and boxing techniques.'),
+('Yoga', 'Improve flexibility, balance and relaxation.'),
+('HIIT', 'High-intensity exercises to improve fitness.');
+
 ```
 
 **Locations Table**
