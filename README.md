@@ -235,6 +235,8 @@ CREATE TABLE activities (
     PRIMARY KEY (activity_id)
 );
 
+```
+
 
 **To add new activities, run the following SQL:**
 
