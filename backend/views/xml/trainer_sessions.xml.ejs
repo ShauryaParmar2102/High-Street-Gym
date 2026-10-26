@@ -14,7 +14,7 @@
 
         <% sessions.forEach((item) => { %>
 
-            <session>
+            <session id="<%= item.session.id %>">
                 <sessionId><%= item.session.id %></sessionId>
                 <activity><%= item.activity.name %></activity>
                 <trainer><%= item.user.firstName %> <%= item.user.lastName %></trainer>

@@ -9,8 +9,7 @@
     <bookings>
         <% bookings.forEach((booking) => { %>
 
-        <booking>
-            <bookingId><%= booking.id %></bookingId>
+            <booking id="<%= booking.id %>" status="<%= booking.bookingStatus %>">
             <activity><%= booking.session?.activity?.name || "N/A" %></activity>
             <memberId><%= booking.memberId %></memberId>
             <sessionId><%= booking.sessionId %></sessionId>
