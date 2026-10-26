@@ -368,21 +368,28 @@ After creating the tables, insert the sample gym activities using the SQL provid
 **Important:** Do not upload real user information, password hashes, authentication keys or database credentials to GitHub.
 
 
+
 ### 5️⃣ Start the Application
 
 #### ⚙️ Start the Backend
 
-Open a terminal in the project root and navigate to the backend folder:
+Open a terminal in the project root and run:
 
 ```bash
-cd backend
+npm run -w backend dev
 ```
 
-Start the Express server using the script defined in `backend/package.json`.
+This starts the Express backend using Nodemon.
+
+The backend runs at:
+
+`http://localhost:8080`
+
+Make sure MySQL is running and the database connection is configured correctly.
 
 #### 🎨 Start the Frontend
 
-Open a second terminal in the project root:
+Open a second terminal in the project root and run:
 
 ```bash
 cd frontend
@@ -390,6 +397,7 @@ npm run dev
 ```
 
 Open the local URL displayed by Vite.
+
 
 ---
 
