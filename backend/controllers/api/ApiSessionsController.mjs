@@ -235,19 +235,27 @@ static async createTrainerSession(req, res) {
             const sessions =
                 await SessionActivityModel.getAllWithDetails();
             // Start the XML document
-            let xml =
-                `<?xml version="1.0" encoding="UTF-8"?>\n<sessions>\n`;
-             // Add each session to the XML document
+            let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<sessions>\n`;
+
+            // Add each session to the XML document
             sessions.forEach((s) => {
+                // Format the date as YYYY-MM-DD
+                const date = new Date(s.session_date);
+                const formattedDate = [
+                    date.getFullYear(),
+                    String(date.getMonth() + 1).padStart(2, "0"),
+                    String(date.getDate()).padStart(2, "0")
+                ].join("-");
+
                 xml += `
                     <session id="${s.session_id}">
-                    <activity_name>${s.activity_name}</activity_name>
-                    <location_name>${s.location_name}</location_name>
-                    <date>${s.session_date}</date>
-                    <start_time>${s.start_time}</start_time>
-                    <end_time>${s.end_time}</end_time>
-                    <capacity>${s.capacity}</capacity>
-                </session>`;
+                        <activity_name>${s.activity_name}</activity_name>
+                        <location_name>${s.location_name}</location_name>
+                        <date>${formattedDate}</date>
+                        <start_time>${s.start_time}</start_time>
+                        <end_time>${s.end_time}</end_time>
+                        <capacity>${s.capacity}</capacity>
+                    </session>`;
             });
             // Close the XML document
             xml += `\n</sessions>`;
