@@ -1,3 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE bookingHistory [
+    <!ELEMENT bookingHistory (member, exportDate, bookings)>
+    <!ELEMENT member (name)>
+    <!ELEMENT name (#PCDATA)>
+    <!ELEMENT exportDate (#PCDATA)>
+    <!ELEMENT bookings (booking*)>
+    <!ELEMENT booking (activity, memberId, sessionId, sessionDate, startTime, endTime, bookingStatus, bookingDate)>
+    <!ATTLIST booking id CDATA #REQUIRED status CDATA #REQUIRED>
+    <!ELEMENT activity (#PCDATA)>
+    <!ELEMENT memberId (#PCDATA)>
+    <!ELEMENT sessionId (#PCDATA)>
+    <!ELEMENT sessionDate (#PCDATA)>
+    <!ELEMENT startTime (#PCDATA)>
+    <!ELEMENT endTime (#PCDATA)>
+    <!ELEMENT bookingStatus (#PCDATA)>
+    <!ELEMENT bookingDate (#PCDATA)>
+]>
+
 <bookingHistory>
 
     <member>

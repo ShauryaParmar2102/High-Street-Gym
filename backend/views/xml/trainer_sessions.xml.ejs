@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE trainerSchedule [
+    <!ELEMENT trainerSchedule (trainer, week, sessions)>
+    <!ELEMENT trainer (#PCDATA | name)*>
+    <!ELEMENT name (#PCDATA)>
+
+    <!ELEMENT week (startDate, endDate)>
+    <!ELEMENT startDate (#PCDATA)>
+    <!ELEMENT endDate (#PCDATA)>
+
+    <!ELEMENT sessions (session*)>
+    <!ELEMENT session (activity, trainer, location, date, startTime, endTime)>
+    <!ATTLIST session id CDATA #REQUIRED>
+
+    <!ELEMENT activity (#PCDATA)>
+    <!ELEMENT location (#PCDATA)>
+    <!ELEMENT date (#PCDATA)>
+    <!ELEMENT startTime (#PCDATA)>
+    <!ELEMENT endTime (#PCDATA)>
+]>
+
 <trainerSchedule>
 
     <trainer>
