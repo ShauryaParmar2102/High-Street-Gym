@@ -15,8 +15,7 @@
         <% sessions.forEach((item) => { %>
 
             <session id="<%= item.session.id %>">
-                <sessionId><%= item.session.id %></sessionId>
-                <activity><%= item.activity.name %></activity>
+    <activity><%= item.activity.name %></activity>
                 <trainer><%= item.user.firstName %> <%= item.user.lastName %></trainer>
                 <location><%= item.location.name %></location>
                 <date><%= new Date(item.session.sessionDate).toLocaleDateString("en-AU") %></date>

@@ -240,15 +240,14 @@ static async createTrainerSession(req, res) {
              // Add each session to the XML document
             sessions.forEach((s) => {
                 xml += `
-                    <session>
-                        <session_id>${s.session_id}</session_id>
-                        <activity_name>${s.activity_name}</activity_name>
-                        <location_name>${s.location_name}</location_name>
-                        <date>${s.session_date}</date>
-                        <start_time>${s.start_time}</start_time>
-                        <end_time>${s.end_time}</end_time>
-                        <capacity>${s.capacity}</capacity>
-                    </session>`;
+                    <session id="${s.session_id}">
+                    <activity_name>${s.activity_name}</activity_name>
+                    <location_name>${s.location_name}</location_name>
+                    <date>${s.session_date}</date>
+                    <start_time>${s.start_time}</start_time>
+                    <end_time>${s.end_time}</end_time>
+                    <capacity>${s.capacity}</capacity>
+                </session>`;
             });
             // Close the XML document
             xml += `\n</sessions>`;
