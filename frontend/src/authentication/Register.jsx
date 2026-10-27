@@ -13,12 +13,12 @@ function Register() { // Creates the Register React component
     const [status, setStatus] = useState(""); // Stores the current registration status or message
     const navigate = useNavigate(); // Lets the user navigate to another page
 
-    const submitUser = useCallback(() => {
-        setLoading(true);
-        setStatus("");
-        setValidationErrors({});
+    const submitUser = useCallback(() => { // Handles the registration form submission
+        setLoading(true); // Sets loading to true while processing registration
+        setStatus("");  // Clears any previous status or error messages
+        setValidationErrors({});  // Clears previous validation errors
 
-        const errors = {};
+        const errors = {}; // Creates an empty object to store new validation errors
 
         // Allows letters, spaces, hyphens, and apostrophes with at least 2 characters
         if(!/^[a-zA-Z\-'\s]{2,}$/.test(first_name)) {
