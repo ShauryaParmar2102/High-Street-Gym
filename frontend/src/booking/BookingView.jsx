@@ -87,7 +87,7 @@ setSessions(sessionResponse.body);
     // Stop displaying the loading spinner
     setIsLoading(false);
 }
-}, [navigate]);
+}, [navigate]); // Recreates the function if the navigate function changes
 
 
     // Cancel a booking selected by the user

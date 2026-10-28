@@ -410,7 +410,7 @@ session.capacity = Number(capacity);
             try {
                 const id = Number(req.params.id);  // Convert the session ID from the URL into a number
                 
-                await SessionModel.delete(id); // Permanently delete the selected session
+                await SessionModel.delete(id); // Permanently delete the selected session from Database
 
                 return res.status(200).json({
                     message: "Session deleted successfully"

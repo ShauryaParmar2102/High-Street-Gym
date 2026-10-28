@@ -1,6 +1,6 @@
 import { FaDumbbell, FaCalendarAlt, FaCalendarCheck, FaBlog, FaUser, FaLock } from "react-icons/fa";
 import { TbLogin } from "react-icons/tb";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaHome } from "react-icons/fa"; // Imports the Home icon
 import { Outlet, useNavigate, useLocation } from "react-router";
 import { useAuthenticate } from "../authentication/UseAuthenticate";
 
@@ -69,7 +69,7 @@ return (
                 className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-lg border border-white bg-white px-4 text-[#452078] shadow-sm transition-colors hover:bg-purple-100"
                 aria-label="Login"
                 >
-                    <FaArrowLeft size={16} />
+                    <FaHome size={18} /> {/* Displays the Home icon */}
                     <span className="text-sm font-semibold">Home</span>
                 </button>
             )}
