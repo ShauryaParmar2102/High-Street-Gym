@@ -62,9 +62,14 @@ static async getById(id) {
     // Select the post where post_id matches the provided ID
     return this.query(
         `
-        SELECT *
-        FROM posts
-        WHERE post_id = ?
+        SELECT
+        posts.*,
+        users.first_name,
+        users.last_name
+    FROM posts
+    INNER JOIN users
+        ON posts.user_id = users.user_id
+    WHERE posts.post_id = ?
         `,
         [id]
     ).then((result) => {
