@@ -62,14 +62,14 @@ function ProfileView() {
             return;
         }
 
-            // Send a PATCH request to update the user's details in the backend
+        // Send a PATCH request to update the user's details in the backend
         fetchAPI(
-            "PATCH",
-            "/users/" + user.id,
+            "PATCH", // HTTP method used to update existing data
+            "/users/" + user.id, // API endpoint for the current user's ID
             {
-                firstName: firstName.trim(),
-                lastName: lastname.trim(),
-                email: email.trim()
+                firstName: firstName.trim(), // Remove extra spaces from the first name
+                lastName: lastname.trim(), // Remove extra spaces from the last name
+                email: email.trim() // Remove extra spaces from the email
             },
             localStorage.getItem("auth-key") // Get the authentication key from local storage
         )
