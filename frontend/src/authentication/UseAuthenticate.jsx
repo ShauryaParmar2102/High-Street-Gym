@@ -41,7 +41,7 @@ export function AuthenticationProvider({children}) {  // Creates a provider comp
                         setStatus,  // Shares the function used to update the status
                     }}
                     >
-                        {children}
+                        {children} {/* Renders the nested components that can access the authentication context */}
                     </AuthenticationController.Provider>
             ); 
         }
