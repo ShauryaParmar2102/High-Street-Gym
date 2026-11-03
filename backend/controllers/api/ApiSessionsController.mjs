@@ -217,7 +217,12 @@ const sessions =
                     activity_name: item.activity_name,
                     location_name: item.location_name,
                     trainer_name: item.trainer_name,
-                    session_date: item.session_date,
+                    session_date: new Intl.DateTimeFormat("en-CA", {
+                    timeZone: "Australia/Brisbane",
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                }).format(new Date(item.session_date)),
                     start_time: item.start_time,
                     end_time: item.end_time,
                     capacity: item.capacity,
