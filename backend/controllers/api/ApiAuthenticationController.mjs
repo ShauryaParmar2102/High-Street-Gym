@@ -16,7 +16,9 @@ export class ApiAuthenticationController {
         this.routes.delete("/authenticate", this.#APIAuthenticationProvider, this.handleAuthenticate); // Verify the user is authenticated before removing the authentication key
     }
 
-    // Middleware that authenticates API requests using an authentication key
+    // ========== AUTHENTICATION MIDDLEWARE ==========
+    // Reads the Authentication-Key header and looks up the user in MySQL.
+    // Returns HTTP 401 for an invalid key and 500 for a database error.
     static async #APIAuthenticationProvider(req, res, next) {
         const authenticationKey = req.get("Authentication-Key");
 
@@ -44,8 +46,10 @@ export class ApiAuthenticationController {
         next(); // Continue to next route
     }
 
-    // ==================== API USER LOGIN AUTHENTICATION ====================
-    // Handle user authentication and login requests
+    // ========== POST - USER LOGIN AUTHENTICATION ==========
+    // Finds the user by email and verifies their password using bcrypt.
+    // Generates a unique authentication key after successful login.
+    // Returns HTTP 200 on success or 401 for invalid credentials.
     static async handleAuthenticate(req, res) {
         // Handle user login
         if (req.method == "POST") {
@@ -85,7 +89,10 @@ export class ApiAuthenticationController {
                 });
             }
         }
-            // Handle user logout
+        // ========== DELETE - USER LOGOUT ==========
+        // Checks whether the user is authenticated before logging out.
+        // Removes the user's authentication key from the database.
+        // Returns HTTP 200 on success, 401 if unauthenticated, or 500 on server error.
         if (req.method === "DELETE") {
     try {
         // Check that a user is currently authenticated
@@ -114,7 +121,11 @@ export class ApiAuthenticationController {
 }
     }
 
-    // Restrict access to routes based on authentication and user role
+    // ========== ROLE-BASED AUTHORISATION ==========
+    // Checks whether the user is authenticated and has an allowed role.
+    // Returns HTTP 401 if the user is not authenticated.
+    // Returns HTTP 403 if the user's role is not permitted.
+    // Allows the request to continue when the checks pass.
     static restrict(allowedRoles) {
          
           // Return middleware that checks the current user

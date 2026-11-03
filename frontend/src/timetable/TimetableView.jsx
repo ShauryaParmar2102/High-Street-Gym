@@ -8,7 +8,9 @@ import { useAuthenticate } from "../authentication/UseAuthenticate";
 // Displays the gym timetable
 function TimetableView() {
 
-    // Store the search filter entered by the user
+// ========== REACT STATE MANAGEMENT ==========
+// Stores search filters, session data and booking-related information.
+// React updates the interface when these state values change.
     const [filter, setFilter] = useState(""); 
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -50,7 +52,10 @@ const [bookedSessionIds, setBookedSessionIds] = useState([]);
         }
     }, [user, navigate]);
 
-     // Fetch gym sessions from the backend API
+// ========== GET - FETCH GYM SESSIONS ==========
+// Retrieves gym sessions from the backend using a GET request.
+// Supports searching sessions using a query parameter.
+// Updates React state with the returned session data.
     const getSessions = useCallback(() => {
 
         // Add the search filter to the request if one has been entered
@@ -120,7 +125,10 @@ const request =
         setBookingError(null);
     };
 
-     // Send a booking request for the selected gym session
+// ========== POST - CREATE SESSION BOOKING ==========
+// Sends the selected session ID to the booking API.
+// Includes the authentication key to identify the logged-in user.
+// Displays booking errors or redirects after successful booking.
     const handleBookSession = () => {
 
           // Stop if the user has not selected a session

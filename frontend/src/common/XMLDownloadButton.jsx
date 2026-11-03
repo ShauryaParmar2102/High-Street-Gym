@@ -1,7 +1,9 @@
 import { useCallback } from "react";
 import {API_BASE_URL} from "../api.mjs"
 
-// Button component used to download XML files
+// ========== REUSABLE REACT COMPONENT ==========
+// Reusable button for downloading XML files from different API endpoints.
+// Accepts props for the route, authentication key, filename and styling.
 function XMLDownloadButton({
     children,
     className,
@@ -10,7 +12,9 @@ function XMLDownloadButton({
     filename = "export.xml",
 }) {
 
-     // Function to download the XML file
+    // ========== XML DOWNLOAD API REQUEST ==========
+    // Uses useCallback to memoize the download function.
+    // Sends an authenticated GET request to retrieve XML from the backend.
     const download = useCallback(() => {
 
         // Send a GET request to the backend
@@ -26,7 +30,9 @@ function XMLDownloadButton({
             // Check if the request was successful
             if (response.status == 200) {
 
-                // Convert the response into a downloadable file
+                // ========== XML FILE DOWNLOAD ==========
+                // Converts the API response into a Blob.
+                // Creates a temporary download link to save the XML file.
                 response.blob().then((data) => {
                     const a = document.createElement("a");  // Create a temporary download link
                     a.href = URL.createObjectURL(data); // Create a URL for the XML file

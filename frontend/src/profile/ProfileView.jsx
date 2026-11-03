@@ -9,16 +9,22 @@ function ProfileView() {
     // Get the logged-in user's details, refresh function and authentication status
     const {user, refresh, status: authStatus } = useAuthenticate();
 
-     // Store the user's first name
+// ========== REACT STATE MANAGEMENT ==========
+// useState stores profile form values, validation errors and loading status.
+// Updating state automatically updates the React interface.
     const [firstName, setFirstName] = useState("");
     const [lastname, setLastName] = useState("");
     const [email, setEmail] = useState("");
+
+    // Store the optional new password
+const [password, setPassword] = useState("");
 
     const [validationErrors, setValidationErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState(null);
 
-       // Fill in the form with the logged-in user's details
+// ========== USEEFFECT - LOAD PROFILE ==========
+// Populates the profile form when the authenticated user changes.
     useEffect(() => {
         if(user) {
             setFirstName(user.firstName || "");
@@ -39,7 +45,9 @@ function ProfileView() {
         setLoading(true);
         setStatus(null);
 
-        // Store any validation errors
+        // ========== CLIENT-SIDE FORM VALIDATION ==========
+        // Validates first name, last name and email before sending the request.
+        // Prevents submission when validation errors exist.
         const errors = {};
 
             // Check if the first name contains valid characters and is at least 2 characters long
@@ -62,14 +70,18 @@ function ProfileView() {
             return;
         }
 
-        // Send a PATCH request to update the user's details in the backend
+        // ========== PATCH - UPDATE USER PROFILE ==========
+        // Sends updated profile details to the backend using PATCH.
+        // Includes the authentication key and optional password change.
+        // Refreshes the displayed user information after a successful update.
         fetchAPI(
             "PATCH", // HTTP method used to update existing data
             "/users/" + user.id, // API endpoint for the current user's ID
             {
                 firstName: firstName.trim(), // Remove extra spaces from the first name
                 lastName: lastname.trim(), // Remove extra spaces from the last name
-                email: email.trim() // Remove extra spaces from the email
+                email: email.trim(), // Remove extra spaces from the email
+                ...(password.trim() && { password })
             },
             localStorage.getItem("auth-key") // Get the authentication key from local storage
         )
@@ -78,6 +90,7 @@ function ProfileView() {
         .then(response => {
             if(response.status === 200) {
                 setStatus("Profile updated successfully");
+                setPassword("");
                 refresh();
             } else {
 
@@ -98,7 +111,7 @@ function ProfileView() {
         });   
 
         // Recreate the function when any of these dependencies change
-    }, [firstName, lastname, email, user, refresh]);
+    }, [firstName, lastname, email, password, user, refresh]);
 
     // Show a loading spinner while authentication is being restored
     if (authStatus === "resuming") {
@@ -219,6 +232,21 @@ function ProfileView() {
                                 {validationErrors.email}
                             </label>
                         )}
+
+                        {/* NEW PASSWORD */}
+                        <label className="label text-neutral-700">
+                            New Password (Optional)
+                        </label>
+
+                        <input
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            className="input w-full rounded-lg border border-neutral-300 bg-white text-neutral-900 placeholder:text-neutral-500 focus:border-neutral-500 focus:outline-none"
+                            type="password"
+                            placeholder="Leave blank to keep current password"
+                            autoComplete="new-password"
+                            disabled={loading}
+                        />
            
 
              {/* STATUS */}

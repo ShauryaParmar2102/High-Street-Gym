@@ -9,7 +9,8 @@ import { ApiUserController } from "./ApiUserController.mjs";
 import { ApiPostController } from "./ApiPostController.mjs";
 import { ApiBookingsController } from "./ApiBookingsController.mjs";
 
-// Swagger and OpenAPI configuration
+// ========== OPENAPI CONFIGURATION ==========
+// Defines API documentation settings and the Authentication-Key security scheme.
 const options = {
     failOnErrors: true,
 
@@ -43,7 +44,8 @@ const options = {
     ],
 };
 
-// Generate the OpenAPI specification
+// ========== LOAD OPENAPI SPECIFICATION ==========
+// Loads components.yaml containing the documented REST API endpoints.
 const specification = YAML.load(
     path.join(import.meta.dirname, "../../components.yaml")
 );
@@ -75,14 +77,18 @@ export class ApiController {
          *         description: Swagger documentation page
          */
 
-        // Display Swagger API documentation
+// ========== SWAGGER API DOCUMENTATION ==========
+// Displays interactive API documentation at /api/docs.
+// Allows API endpoints to be viewed and tested through Swagger UI.
         this.routes.use(
             "/docs",
             SwaggerUI.serve,
             SwaggerUI.setup(specification),
         );
 
-        // Validate API requests against the OpenAPI specification
+        // ========== API REQUEST VALIDATION ==========
+        // Validates incoming API requests against components.yaml.
+        // Response validation is currently disabled.
         this.routes.use(
             ApiValidator.middleware({
                 apiSpec: specification,
@@ -93,17 +99,22 @@ export class ApiController {
             }),
         );
 
-        // Authentication middleware and login/logout routes
+        // ========== API AUTHENTICATION ==========
+        // Applies authentication middleware and registers login/logout routes.
         this.routes.use(ApiAuthenticationController.middleware);
         this.routes.use(ApiAuthenticationController.routes);
 
-        // Mount API resource controllers
+        // ========== API ROUTING AND SEPARATION OF CONCERNS ==========
+        // Connects sessions, users, posts and bookings to separate controllers.
+        // Keeps endpoint logic organised into individual modules.
         this.routes.use("/sessions", ApiSessionsController.routes);
         this.routes.use("/users", ApiUserController.routes);
         this.routes.use("/posts", ApiPostController.routes);
         this.routes.use("/bookings", ApiBookingsController.routes);
 
-        // Handle OpenAPI validation and other API errors as JSON
+        // ========== API ERROR HANDLING ==========
+        // Catches API errors and returns JSON responses.
+        // Uses the error's HTTP status code or 500 when no status is provided.
         this.routes.use((err, req, res, next) => {
             console.error(err);
 

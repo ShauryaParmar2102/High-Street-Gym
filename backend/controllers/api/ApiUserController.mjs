@@ -6,6 +6,9 @@ import { UserModel } from "../../models/UserModel.mjs";
 export class ApiUserController {
     static routes = express.Router(); // Create an Express router for all user API routes
 
+    // ========== USER API ROUTES ==========
+    // Defines POST, GET and PATCH endpoints for user management.
+    // Uses authentication middleware and role-based access checks.
     static{
         this.routes.use(ApiAuthenticationController.middleware); // Require authentication for every route in this controller
 
@@ -30,7 +33,10 @@ export class ApiUserController {
             this.getUserbyId,
         );
     }
-            //Create a new member
+    // ========== POST - MEMBER REGISTRATION ==========
+    // Creates a new member account.
+    // Hashes the password using bcrypt before saving to MySQL.
+    // Returns HTTP 201 when the account is successfully created.
     static async createNewMember(req, res) {
         try {
             if(!req.body.email || !req.body.password) {
@@ -70,7 +76,10 @@ export class ApiUserController {
             });
         }
     }
-            //Return the logged in user's information
+    // ========== GET - AUTHENTICATED USER ==========
+    // Retrieves the currently logged-in user's details.
+    // Returns their ID, name, email, role and account creation date.
+    // Demonstrates the GET /users/self endpoint.
     static async getAuthenticatedUser(req,res) {
         const user = req.authenticatedUser;
 
@@ -83,7 +92,10 @@ export class ApiUserController {
          createdAt: user.createdAt,
         });
     }
-            //Get a specific user by ID
+    // ==========  GET - USER BY ID ==========
+    // Retrieves a specific user's information from MySQL.
+    // Only allows the user themselves or an administrator to view it.
+    // Returns HTTP 403 for forbidden access and 404 if the user is not found.
     static async getUserbyId(req,res){
         try{
             //Convert URL parameter to a number
@@ -135,7 +147,11 @@ export class ApiUserController {
             });
         }
     }
-
+// ========== PATCH - UPDATE USER INFORMATION ==========
+// Allows authenticated users to update their own personal details.
+// Updates only supplied fields while preserving existing information.
+// Hashes a new password if provided.
+// Returns HTTP 200 when the update succeeds.
     static async UserPersonalInformation(req, res) {
         try {
             const user = req.authenticatedUser;
@@ -157,7 +173,10 @@ export class ApiUserController {
                 });
             }
 
-    // Keep existing information and update the allowed fields
+// ========== PATCH - PARTIAL USER UPDATE ==========
+// Creates an updated user object using the existing database values.
+// Only changes fields provided in the request body.
+// Preserves existing values when fields are omitted.
     const updateData = {
         id: targetUserId,
         firstName: req.body.firstName ?? existingUser.firstName,

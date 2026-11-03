@@ -19,6 +19,10 @@ function LoginView() {
             [email, password, login] // Recreates the function if email, password, or login changes
     );
 
+    // ========== ROLE-BASED LOGIN REDIRECTION ==========
+    // Redirects members to the timetable and trainers to the sessions page.
+    // Only members and trainers have a defined redirect after login.
+
     useEffect(() => { // Runs when the logged-in user changes
         if (user) {  // Checks that a user is logged in
             if (user.role === "member") { // Checks if the user is a member
@@ -72,9 +76,17 @@ function LoginView() {
                                     />
                             </label>
 
-                            {status && status !== "loaded" && !isAuthenticating && (
-                                <div className="alert alert-error py-2 text-sm rounded-lg">
-                                    <span>{status}</span>
+                            {/* ========== LOGIN ERROR MESSAGE ========== */}
+                            {status && !["loaded", "resuming", "loading", "authenticating", "logged out", "Logged out"].includes(status) && (
+                                <div
+                                    role="alert"
+                                    className="alert alert-error rounded-lg py-2 text-sm"
+                                >
+                                    <span>
+                                        {status === "invalid_credentials"
+                                            ? "Incorrect email or password"
+                                            : status}
+                                    </span>
                                 </div>
                             )}
 

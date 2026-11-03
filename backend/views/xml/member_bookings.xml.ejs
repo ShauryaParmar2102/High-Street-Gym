@@ -34,7 +34,12 @@
             <sessionId><%= booking.sessionId %></sessionId>
 
 <sessionDate><%= booking.session?.session?.sessionDate
-    ? new Date(booking.session.session.sessionDate).toISOString().split("T")[0]
+    ? new Date(booking.session.session.sessionDate).toLocaleDateString("en-CA", {
+        timeZone: "Australia/Brisbane",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    })
     : "N/A" %></sessionDate>
 
     <startTime><%= booking.session?.session?.startTime || "N/A" %></startTime>

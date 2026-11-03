@@ -7,6 +7,9 @@ import { SessionActivityModel } from "../../models/SessionActivityModel.mjs";
 export class ApiBookingsController{
     static routes = express.Router();
 
+// ========== BOOKING API ROUTES AND AUTHENTICATION ==========
+// Requires users to be authenticated before accessing booking endpoints.
+// Defines POST, GET and DELETE routes for managing bookings.
     static {
     // Run authentication middleware for API requests 
     this.routes.use(ApiAuthenticationController.middleware);
@@ -21,7 +24,10 @@ export class ApiBookingsController{
     this.routes.delete("/:id", this.deleteBooking); // Delete a booking by ID
 }
 
-// Create a new booking for the logged-in user
+// ==========  POST - CREATE BOOKING ==========
+// Creates a new booking for the authenticated user.
+// Saves the booking to MySQL and returns HTTP 200 on success.
+// Returns HTTP 409 when a duplicate booking is detected.
     static async createBooking(req, res) {
         try {
             const booking = new BookingModel(
@@ -57,7 +63,9 @@ export class ApiBookingsController{
 }
 }
 
-    //Get bookings for a User that is logged in
+// ========== GET - MEMBER BOOKINGS ==========
+// Retrieves bookings belonging to the authenticated user.
+// Returns booking records as JSON with HTTP 200.
     static async getUserBookings(req,res) {
         try {
             const bookings = await BookingModel.getByMemberId(req.authenticatedUser.id);
@@ -70,7 +78,9 @@ export class ApiBookingsController{
         }
     }
 
-    //Delete Booking
+// ========== OBSERVATION: DELETE - CANCEL BOOKING ==========
+// Deletes a booking using its booking ID.
+// Returns HTTP 400 for an invalid ID and 200 on success.
     static async deleteBooking(req, res) {
         try {
             const id = Number(req.params.id);
@@ -93,7 +103,10 @@ export class ApiBookingsController{
             });
         }
     }
-
+    // ========== XML BOOKING EXPORT ==========
+    // Retrieves the authenticated user's booking history.
+    // Combines bookings with session information.
+    // Generates XML using an EJS template.
     static async getMemberBookingsXML(req, res) {
         try{
             const date = new Date().toLocaleDateString("en-AU", {

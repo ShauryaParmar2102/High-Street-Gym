@@ -9,6 +9,10 @@ export class ApiSessionsController {
     static routes = express.Router(); // Create an Express router for API session routes
 
     static {
+
+    // ========== AUTHENTICATION ==========
+    // Requires authentication for the session API routes.
+
     this.routes.use(ApiAuthenticationController.middleware);     // Run authentication middleware before all session API routes
 
     // ==================== SESSION API ROUTES ====================
@@ -23,21 +27,26 @@ export class ApiSessionsController {
     this.routes.get("/activities", this.getActivities);
 this.routes.get("/locations", this.getLocations);
 
-// Create a new trainer session
+// ==========  POST ENDPOINT AND ROLE-BASED AUTHORISATION ==========
+// Allows only authenticated trainers to create new gym sessions.
 this.routes.post(
     "/",
     ApiAuthenticationController.restrict(["trainer"]),
     this.createTrainerSession
 );
 
-    // Update a trainer's existing session
+// ========== PUT ENDPOINT - UPDATE TRAINER SESSION ==========
+// Allows trainers and administrators to update an existing session.
+// Uses role-based authorisation to restrict access.
 this.routes.put(
     "/:id",
     ApiAuthenticationController.restrict(["administrator", "trainer"]),
     this.updateTrainerSession
 );
 
-    // Delete a session (administrators and trainers only)
+// ========== DELETE ENDPOINT - DELETE TRAINER SESSION ==========
+// Allows trainers and administrators to delete gym sessions.
+// Uses role-based authorisation to restrict access.
     this.routes.delete("/:id",ApiAuthenticationController.restrict(["administrator", "trainer"]),
     this.deleteTrainerSessions,
     );
@@ -72,8 +81,8 @@ static async getLocations(req, res) {
 }
 
 
-// ==================== CREATE SESSION ====================
-
+// ==================== CREATE TRAINER SESSION ====================
+// Validates session details, prevents duplicates and saves new sessions to MySQL.
 static async createTrainerSession(req, res) {
     try {
         const trainerId = Number(req.authenticatedUser.id);
@@ -226,9 +235,8 @@ static async createTrainerSession(req, res) {
         }
     }
 
-        // ==================== GET SESSIONS AS XML ====================
-
-        // Retrieve all sessions and convert them into XML format
+// ==================== GET SESSIONS AS XML ====================
+// Generates a sessions XML document with session IDs, activities, locations, formatted dates, start times, end times and capacities.
     static async getSessionsXML(req, res) {
         try {
             // Fetch all sessions with their related details from the database
@@ -271,9 +279,8 @@ static async createTrainerSession(req, res) {
         }
     }
 
-        // ==================== GET SESSIONS BY TRAINER ====================
-
-// Get all sessions belonging to a specific trainer
+// ==================== GET TRAINER SESSIONS ====================
+// Retrieves sessions belonging to the currently authenticated trainer.
    static async getTrainerSessionsById(req, res) {
     try {
         // Check if the user is authenticated
@@ -297,9 +304,8 @@ static async createTrainerSession(req, res) {
            }  
          }
 
-         // ==================== UPDATE SESSION ====================
-
-// Update an existing trainer session
+    // ==================== UPDATE SESSION ====================
+// Validates updated session details and saves changes to MySQL and checks that the user owns the session or is an administrator.
 static async updateTrainerSession(req, res) {
     try {
         const id = Number(req.params.id);
@@ -405,7 +411,7 @@ session.capacity = Number(capacity);
 
          // ==================== DELETE SESSION ====================
 
-         // Delete a session using its session ID
+         // Delete a trainer session using its session ID
          static async deleteTrainerSessions(req, res) {
             try {
                 const id = Number(req.params.id);  // Convert the session ID from the URL into a number

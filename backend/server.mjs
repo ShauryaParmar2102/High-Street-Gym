@@ -18,7 +18,10 @@ const app = express();
 const port = 8080;
 
 
-// Allow requests from the React frontend
+// ========== CORS CONFIGURATION ==========
+// Allows the React frontend on port 5173 to access the backend on port 8080.
+// Supports GET, POST, PUT, PATCH, DELETE and OPTIONS requests.
+// Allows the Authentication-Key header for authenticated API requests.
 app.use(cors({
     origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -43,22 +46,28 @@ console.log(
     Object.keys(swaggerDocument.paths?.["/sessions/{id}"] || {})
 );
 
+// ========== EJS VIEW ENGINE ==========
+// Configures EJS templates for rendering backend web pages.
 app.set("view engine", "ejs");
 app.set("views", path.join(import.meta.dirname, "views"));
 
+// ========== REQUEST BODY MIDDLEWARE ==========
+// Parses incoming JSON and URL-encoded form data.
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-// Enable the session and authenticated-user middleware
+// ========== AUTHENTICATION MIDDLEWARE ==========
+// Runs the backend authentication middleware before the routes below.
 app.use(AuthenticationController.middleware);
 
 // Mount the authentication routes
 app.use("/authenticate", AuthenticationController.routes);
 
-// Mount the API routes
+// ========== API ROUTING AND SEPARATION OF CONCERNS ==========
+// Mounts the REST API routes under /api.
+// Individual controllers handle their own endpoint logic.
 app.use("/api", ApiController.routes);
-
 
 app.use("/booking", BookingController.routes); // Booking routes
  
@@ -88,6 +97,8 @@ app.use(
     })
 );
 
+// ========== SERVER STARTUP ==========
+// Starts the Express backend server on port 8080.
 app.listen(port, () => {
     console.log(`Backend started on http://localhost:${port}`);
 });

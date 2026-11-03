@@ -5,6 +5,9 @@ import { PostModel } from "../../models/PostModel.mjs";
 export class ApiPostController{
     static routes = express.Router();
 
+// ========== BLOG API ROUTES AND AUTHORISATION ==========
+// Applies authentication middleware to blog API routes.
+// Restricts creating, viewing individual and deleting posts to members and trainers.
     static {
             // Run authentication middleware before all API routes
         this.routes.use(ApiAuthenticationController.middleware);
@@ -32,6 +35,9 @@ export class ApiPostController{
         );
     }
 
+// ========== GET - ALL BLOG POSTS ==========
+// Retrieves all blog posts from MySQL.
+// Returns JSON with HTTP 200 or HTTP 500 if loading fails.
     static async getPosts(req, res) {
         try{ 
             const posts = await PostModel.getAll(); // Retrieve all posts from the database
@@ -45,6 +51,9 @@ export class ApiPostController{
         }
     }
 
+// ========== POST - CREATE BLOG POST ==========
+// Creates a new blog post for the authenticated user.
+// Saves the post to MySQL and returns HTTP 201 on success.
     static async createPost(req, res) {
         try {
             // Check that a user is authenticated
@@ -75,6 +84,10 @@ export class ApiPostController{
         }
     }
 
+// ========== GET - BLOG POST BY ID ==========
+// Retrieves a specific blog post from MySQL.
+// Checks that the authenticated user owns the post.
+// Returns HTTP 403 for forbidden access and 404 if not found.
     static async getPostById(req, res) {
         try {
             // Convert the post ID from the URL to a number
@@ -117,6 +130,10 @@ export class ApiPostController{
 
          }
 
+// ========== DELETE - BLOG POST ==========
+// Validates the post ID and checks that the post exists.
+// Only allows the post owner to delete it.
+// Returns HTTP 200 on successful deletion.
     static async deletePost(req, res) {
         try {
             const id = Number(req.params.id);

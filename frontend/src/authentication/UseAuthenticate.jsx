@@ -125,8 +125,14 @@ const login = useCallback(async (email, password) => {
         getUser(authKey);
     }
 
+    else if (response.status === 401) {
+    setStatus("invalid_credentials");
+} else {
+    setStatus(response.body?.message || "Login failed. Please try again.");
+}
+
     return response;
-}, [getUser]);
+}, [getUser, setStatus]);
 
         return{ // Returns authentication values and functions from the custom hook
             user, // Returns the current logged-in user
