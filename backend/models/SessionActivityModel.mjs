@@ -84,7 +84,7 @@ export class SessionActivityModel extends DatabaseModel{
 
     // Retrieve all sessions with their related details
     // An optional filter can be used to search the sessions
-    static async getAllWithDetails(filter = ""){
+    static async getAllWithDetails(filter = "", trainerId = null) {
         let query = `
         SELECT
         session.session_id,
@@ -115,6 +115,12 @@ export class SessionActivityModel extends DatabaseModel{
         `;
 
         const params = []; // Stores the values that will be safely inserted into the SQL query
+
+        // Filter sessions by the logged-in trainer when a trainer ID is provided
+if (trainerId !== null) {
+    query += " AND session.trainer_id = ?";
+    params.push(trainerId);
+}
 
         // If the user entered a search term, add search conditions to the query
         if (filter.trim()) {

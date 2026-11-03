@@ -183,8 +183,9 @@ static async createTrainerSession(req, res) {
             const { filter } = req.query; // Get the optional search/filter value from the request 
 
             // Fetch session data and related details from the database
-            const sessions =
-                await SessionActivityModel.getAllWithDetails(filter);
+            // Get the currently logged-in trainer's ID
+const sessions =
+    await SessionActivityModel.getAllWithDetails(filter);
 
             const now = new Date(); // Get the current date and time
 
@@ -240,8 +241,12 @@ static async createTrainerSession(req, res) {
     static async getSessionsXML(req, res) {
         try {
             // Fetch all sessions with their related details from the database
-            const sessions =
-                await SessionActivityModel.getAllWithDetails();
+            // Get the logged-in trainer's ID
+const trainerId = Number(req.authenticatedUser.id);
+
+// Retrieve only sessions belonging to this trainer
+const sessions =
+    await SessionActivityModel.getAllWithDetails("", trainerId);
             // Start the XML document
             let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<sessions>\n`;
 
