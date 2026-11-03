@@ -305,12 +305,14 @@ const request =
                     </p>
 
                     <p className="text-sm opacity-70">
-                        {selectedSession.session_date} (
-                            {new Date(selectedSession.session_date).toLocaleDateString("en-AU", {
-                                weekday: "long",
-                                timeZone: "Australia/Brisbane"
-                            })})
-                    </p>
+                    {new Date(selectedSession.session_date).toLocaleDateString("en-AU", {
+                        weekday: "long",
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        timeZone: "Australia/Brisbane"
+                    })}
+                </p>
 
                     <p className="text-sm opacity-70">
                         {selectedSession.start_time} -{" "}
