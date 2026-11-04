@@ -72,7 +72,6 @@ The project features a **React frontend**, a **Node.js/Express backend**, and a 
 - Validate session capacity
 - Display booking confirmation dialogs
 - View personal bookings
-- Prevent deletion of gym sessions that already have bookings made by members.
 
 ### 📝 Gym Blog
 
