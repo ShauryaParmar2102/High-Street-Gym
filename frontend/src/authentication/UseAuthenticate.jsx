@@ -17,20 +17,31 @@ export function AuthenticationProvider({children}) {  // Creates a provider comp
     useEffect(() => { // Runs authentication checks when the component loads
         const authenticationKey = localStorage.getItem("auth-key"); // Gets the saved authentication key from local storage
 
-        if(authenticationKey){ // Checks if an authentication key exists
-            fetchAPI("GET", "/users/self", null, authenticationKey) // Requests the current user's details from the API
-            .then((response) => { // Runs when the API sends back a response
-                if (response.status === 200) {  // Checks if the user was loaded successfully
-                    setUser(response.body); // Stores the logged-in user's details
-                    setStatus("loaded"); // Sets authentication status to loaded
-                } else {
-                    localStorage.removeItem("auth-key");  // Removes the invalid authentication key
-                    setStatus("logged out");  // Sets the authentication status to logged out
-                }
-            });
+        
+if (authenticationKey) { // Checks if an authentication key exists
+    fetchAPI("GET", "/users/self", null, authenticationKey)
+        .then((response) => {
+            if (response.status === 200) {
+                setUser(response.body); // Stores the logged-in user
+                setStatus("loaded"); // Authentication successful
+            } else {
+                localStorage.removeItem("auth-key");
+                setUser(null);
+                setStatus("logged out");
+            }
+        })
+        .catch((error) => {
+            console.error("Authentication failed:", error);
+            setUser(null);
+            setStatus("logged out");
+        });
+} else {
+    // No authentication key means the user is a guest
+    setUser(null);
+    setStatus("logged out");
+}
+}, []); // Closes useEffect
 
-                    }
-    }, []); // closes useEffect
 
             return(
                 <AuthenticationController.Provider

@@ -1,4 +1,4 @@
-import { FaDumbbell, FaCalendarAlt, FaCalendarCheck, FaBlog, FaUser, FaLock } from "react-icons/fa";
+import { FaDumbbell, FaCalendarAlt, FaCalendarCheck, FaBlog, FaUser, FaLock, FaShieldAlt } from "react-icons/fa";
 import { TbLogin } from "react-icons/tb";
 import { FaHome } from "react-icons/fa"; // Imports the Home icon
 import { Outlet, useNavigate, useLocation } from "react-router";
@@ -174,9 +174,34 @@ return (
                             {/* Display the profile icon and label */}
                             <FaUser className="text-3xl" />
                             <span className="dock-label">Profile</span>
-                        </button>           
+
+                        </button>
+
+                        {/* Privacy Policy navigation button */}
+                        <button
+                            type="button"
+                            onClick={() => navigate("/privacy-policy")}
+                            className={
+                                location.pathname === "/privacy-policy"
+                                    ? "dock-active"
+                                    : ""
+                            }
+                            aria-current={
+                                location.pathname === "/privacy-policy"
+                                    ? "page"
+                                    : undefined
+                            }
+                        >
+                            <FaShieldAlt className="text-3xl" />
+                            <span className="dock-label">
+                                Privacy Policy
+                            </span>
+                        </button>
+
                     </nav>
+
                 </main>
+
             );
         }
 

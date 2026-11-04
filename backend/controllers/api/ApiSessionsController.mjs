@@ -266,6 +266,9 @@ const sessions =
                 <!ELEMENT end_time (#PCDATA)>
                 <!ELEMENT capacity (#PCDATA)>
             ]>
+
+            <!-- Copyright © 2026 High Street Gym. All rights reserved. -->
+            
             <sessions>
             `;
             // Add each session to the XML document

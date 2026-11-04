@@ -115,11 +115,14 @@ function LoginView() {
                                         <FaUserPlus className="text-lg" />
                                         Register
                                     </button>
-                                </div>     
-                        </form>
+                                </div>                     
+                </form>
+
+
                     </div>
                 </div>
             </section>
+
         );
     }
 
