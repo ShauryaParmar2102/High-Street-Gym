@@ -43,6 +43,20 @@ const [bookedSessionIds, setBookedSessionIds] = useState([]);
     // Check whether an authentication key exists in local storage
     const isLoggedIn = Boolean(localStorage.getItem("auth-key"));
 
+    useEffect(() => {
+    if (!isLoggedIn || user?.role !== "member") return;
+
+    fetchAPI("GET", "/bookings", null, localStorage.getItem("auth-key"))
+        .then((response) => {
+            if (response.status === 200) {
+                setBookedSessionIds(
+                    response.body.map(b => Number(b.sessionId))
+                );
+            }
+        })
+        .catch(console.error);
+}, [isLoggedIn, user?.role]);
+
     // REDIRECT TRAINER AWAY FROM MEMBER TIMETABLE
     useEffect(() => {
         if (user?.role === "trainer") {
@@ -268,20 +282,27 @@ const request =
                     </div>
 
     {/* Hide the booking button for trainers, as only members can book gym sessions */}
-    {user?.role !== "trainer" && (
-    <button
-        onClick={() => handleConfirm(session)}
-        // Disable booking button for sessions that have already started or from the past
-        disabled={isPastSession(session)}
-        className="btn w-full rounded-lg border-[#452078] bg-[#452078] text-white hover:border-[#65429a] hover:bg-[#65429a] disabled:cursor-not-allowed disabled:opacity-40"
-    >
-        {isPastSession(session)
-            ? "Session Unavailable"
-            : isLoggedIn
-                ? "Book Session"
-                : "Login to Book"}
-    </button>
+   
+{user?.role !== "trainer" && (
+    bookedSessionIds.includes(Number(session.session_id)) ? (
+<span className="flex w-full items-center justify-center rounded-lg border border-green-300 bg-green-100 px-4 py-3 font-semibold text-green-800">
+    ✓ Booked
+</span>
+    ) : (
+        <button
+            onClick={() => handleConfirm(session)}
+            disabled={isPastSession(session)}
+            className="btn w-full rounded-lg border-[#452078] bg-[#452078] text-white hover:border-[#65429a] hover:bg-[#65429a] disabled:cursor-not-allowed disabled:opacity-40"
+        >
+            {isPastSession(session)
+                ? "Session Unavailable"
+                : isLoggedIn
+                    ? "Book Session"
+                    : "Login to Book"}
+        </button>
+    )
 )}
+
                     </li>
         ))}
         </ul>
