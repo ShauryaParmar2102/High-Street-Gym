@@ -174,6 +174,17 @@ static async deleteByTrainerId(trainerId) {
     );
 }
 
+    // Delete all bookings associated with a specific session
+    static async deleteBySessionId(sessionId) {
+        return this.query(
+            `
+            DELETE FROM bookings
+            WHERE session_id = ?
+            `,
+            [sessionId],
+        );
+    }
+
     static async delete(id){
         return this.query(
             `

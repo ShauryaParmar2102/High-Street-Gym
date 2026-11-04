@@ -69,7 +69,9 @@ export class UserModel extends DatabaseModel {
         });
     }
 
-    // Get a user by their email address
+    // ==================== CHECK IF EMAIL ALREADY EXISTS ====================
+
+    // Check if an email address is already registered in the database
     static async getByEmail(email) {
         
         // Run the SELECT query and return the database result
@@ -93,7 +95,8 @@ export class UserModel extends DatabaseModel {
                 return this.tableToModel(result[0]);
             }
 
-             // Return null if no user was found
+            // If the email does not exist, return null
+            // The registration controller can then proceed with account creation
             return null;
         });
     }

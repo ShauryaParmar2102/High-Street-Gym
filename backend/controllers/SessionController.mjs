@@ -427,9 +427,15 @@ export class SessionController{
         }
 
         //Delete
-        if(action === "delete") {
-            await SessionModel.delete(selectedSessionId);
-        }
+// Delete the session and its associated bookings
+if (action === "delete") {
+
+    // Delete all bookings linked to the session first
+    await BookingModel.deleteBySessionId(selectedSessionId);
+
+    // Delete the session itself
+    await SessionModel.delete(selectedSessionId);
+}
         return res.redirect("/session") ;
 
         // ==================== ADMIN SESSION DELETION ERROR HANDLING ====================
@@ -765,9 +771,12 @@ static async exportTrainerSessionsXml(req, res) {
                     if (Number(existing.trainerId) !== Number(trainerId)) {
                         return res.status(403).send("Not allowed");
                     }
-                    // Delete the selected session
-                    // The database stops deletion if the session has an active booking
-                    await SessionModel.delete(session_id); 
+
+                    // Delete all bookings associated with this session first
+                    await BookingModel.deleteBySessionId(session_id);
+
+                    // Delete the session after removing its bookings
+                    await SessionModel.delete(session_id);
                 }
                 // Return trainer to their sessions page
                 return res.redirect("/session/trainer/view");

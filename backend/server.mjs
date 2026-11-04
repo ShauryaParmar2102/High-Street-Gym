@@ -28,6 +28,8 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authentication-Key"]
 }));
 
+// Load the Swagger API documentation from components.yaml
+// This file defines the API endpoints, request formats, and responses.
 const swaggerDocument = YAML.load(
     path.join(import.meta.dirname, "components.yaml")
 );

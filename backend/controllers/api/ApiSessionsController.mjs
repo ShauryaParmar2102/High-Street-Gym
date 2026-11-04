@@ -1,6 +1,7 @@
 import express from "express";
 import { ApiAuthenticationController } from "./ApiAuthenticationController.mjs";
 import { SessionModel } from "../../models/SessionModel.mjs";
+import { BookingModel } from "../../models/BookingModel.mjs";
 import { SessionActivityModel } from "../../models/SessionActivityModel.mjs";
 import { ActivityModel } from "../../models/ActivityModel.mjs";
 import { LocationModel } from "../../models/LocationModel.mjs";
@@ -253,8 +254,20 @@ const trainerId = Number(req.authenticatedUser.id);
 const sessions =
     await SessionActivityModel.getAllWithDetails("", trainerId);
             // Start the XML document
-            let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<sessions>\n`;
-
+            let xml = `<?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE sessions [
+                <!ELEMENT sessions (session*)>
+                <!ELEMENT session (activity_name, location_name, date, start_time, end_time, capacity)>
+                <!ATTLIST session id CDATA #REQUIRED>
+                <!ELEMENT activity_name (#PCDATA)>
+                <!ELEMENT location_name (#PCDATA)>
+                <!ELEMENT date (#PCDATA)>
+                <!ELEMENT start_time (#PCDATA)>
+                <!ELEMENT end_time (#PCDATA)>
+                <!ELEMENT capacity (#PCDATA)>
+            ]>
+            <sessions>
+            `;
             // Add each session to the XML document
             sessions.forEach((s) => {
                 // Format the date as YYYY-MM-DD
@@ -426,7 +439,11 @@ session.capacity = Number(capacity);
             try {
                 const id = Number(req.params.id);  // Convert the session ID from the URL into a number
                 
-                await SessionModel.delete(id); // Permanently delete the selected session from Database
+                // Delete all bookings associated with the session first
+await BookingModel.deleteBySessionId(id);
+
+// Delete the session after its bookings have been removed
+await SessionModel.delete(id);
 
                 return res.status(200).json({
                     message: "Session deleted successfully"

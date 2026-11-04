@@ -6,7 +6,15 @@ info:
 servers:
   - url: http://localhost:8080/api
     description: Local development server
-  
+tags:
+  - name: Authentication
+  - name: Registration
+  - name: Timetable
+  - name: My Sessions
+  - name: My Bookings
+  - name: Blog
+  - name: Profile
+  - name: XML Exports
 components:
   securitySchemes:
     ApiKey:
@@ -17,8 +25,8 @@ components:
     UserCredentials:
       type: object
       required:
-      - email
-      - password
+        - email
+        - password
       properties:
         email:
           type: string
@@ -30,7 +38,7 @@ components:
     AuthenticationKey:
       type: object
       required:
-      - authenticationKey
+        - authenticationKey
       properties:
         authenticationKey:
           type: string
@@ -55,9 +63,9 @@ components:
         role:
           type: string
           enum:
-          - administrator
-          - trainer
-          - member
+            - administrator
+            - trainer
+            - member
           example: member
         createdAt:
           type: string
@@ -164,9 +172,10 @@ components:
 paths:
   /authenticate:
     post:
+      tags:
+        - Authentication
       summary: Authenticate a user
-      description: Log in a user using their email and password and return an authentication
-        key.
+      description: Log in a user using their email and password and return an authentication key.
       requestBody:
         required: true
         content:
@@ -193,6 +202,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
+      tags:
+        - Authentication
       summary: Log out the authenticated user
       description: Removes the authentication key from the logged-in user.
       security:
@@ -222,16 +233,18 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /sessions:
     get:
+      tags:
+        - Timetable
       summary: Get all gym sessions
       description: Retrieves all gym sessions and returns them as JSON.
       security: []
       parameters:
-      - name: filter
-        in: query
-        required: false
-        description: Optional session search or filter value.
-        schema:
-          type: string
+        - name: filter
+          in: query
+          required: false
+          description: Optional session search or filter value.
+          schema:
+            type: string
       responses:
         '200':
           description: Sessions retrieved successfully
@@ -247,8 +260,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
     post:
+      tags:
+        - My Sessions
       summary: Create a trainer session
       security:
         - ApiKey: []
@@ -291,6 +305,8 @@ paths:
           description: Failed to create session
   /sessions/xml:
     get:
+      tags:
+        - XML Exports
       summary: Export all gym sessions as XML
       description: Retrieves all gym sessions and returns them as an XML document.
       security:
@@ -331,6 +347,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /sessions/trainer:
     get:
+      tags:
+        - My Sessions
       summary: Get sessions for a trainer
       description: Retrieves all sessions belonging to a specific trainer.
       security:
@@ -355,28 +373,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'#
-
+                $ref: '#/components/schemas/ErrorResponse'
   /sessions/activities:
     get:
+      tags:
+        - My Sessions
       summary: Get all activities
       security:
         - ApiKey: []
       responses:
         '200':
           description: List of activities
-
   /sessions/locations:
     get:
+      tags:
+        - My Sessions
       summary: Get all locations
       security:
         - ApiKey: []
       responses:
         '200':
           description: List of locations
-          
   /sessions/{id}:
     put:
+      tags:
+        - My Sessions
       summary: Update a trainer session
       security:
         - ApiKey: []
@@ -427,20 +448,21 @@ paths:
           description: Session not found
         '500':
           description: Failed to update session
-
     delete:
+      tags:
+        - My Sessions
       summary: Delete a session
       description: Deletes a session using its session ID.
       security:
         - ApiKey: []
       parameters:
-      - name: id
-        in: path
-        required: true
-        description: Session ID
-        schema:
-          type: integer
-        example: 63
+        - name: id
+          in: path
+          required: true
+          description: Session ID
+          schema:
+            type: integer
+          example: 63
       responses:
         '200':
           description: Session deleted successfully
@@ -460,6 +482,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /users:
     post:
+      tags:
+        - Registration
       summary: Create a new member
       description: Creates a new member account.
       security: []
@@ -470,8 +494,8 @@ paths:
             schema:
               type: object
               required:
-              - email
-              - password
+                - email
+                - password
               properties:
                 email:
                   type: string
@@ -514,6 +538,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /users/self:
     get:
+      tags:
+        - Profile
       summary: Get the authenticated user's details
       description: Retrieves information about the currently logged-in user.
       security:
@@ -533,18 +559,20 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /users/{id}:
     get:
+      tags:
+        - Profile
       summary: Get a user by ID
       description: Retrieves a specific user's information.
       security:
         - ApiKey: []
       parameters:
-      - name: id
-        in: path
-        required: true
-        description: User ID
-        schema:
-          type: integer
-        example: 5
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: integer
+          example: 5
       responses:
         '200':
           description: User retrieved successfully
@@ -571,18 +599,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     patch:
+      tags:
+        - Profile
       summary: Update a user's personal information
       description: Updates the authenticated user's personal information.
       security:
         - ApiKey: []
       parameters:
-      - name: id
-        in: path
-        required: true
-        description: User ID
-        schema:
-          type: integer
-        example: 5
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: integer
+          example: 5
       requestBody:
         required: true
         content:
@@ -634,6 +664,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /posts:
     get:
+      tags:
+        - Blog
       summary: Get all community posts
       description: Retrieves all community posts.
       security: []
@@ -647,6 +679,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Post'
     post:
+      tags:
+        - Blog
       summary: Create a new community post
       description: Creates a new post for a member or trainer.
       security:
@@ -658,13 +692,13 @@ paths:
             schema:
               type: object
               required:
-              - post
+                - post
               properties:
                 post:
                   type: object
                   required:
-                  - title
-                  - content
+                    - title
+                    - content
                   properties:
                     title:
                       type: string
@@ -700,18 +734,20 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /posts/{id}:
     get:
+      tags:
+        - Blog
       summary: Get a specific post by ID
       description: Retrieves a specific post using its ID.
       security:
         - ApiKey: []
       parameters:
-      - name: id
-        in: path
-        required: true
-        description: Post ID
-        schema:
-          type: integer
-        example: 1
+        - name: id
+          in: path
+          required: true
+          description: Post ID
+          schema:
+            type: integer
+          example: 1
       responses:
         '200':
           description: Post retrieved successfully
@@ -732,18 +768,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
+      tags:
+        - Blog
       summary: Delete a specific post by ID
       description: Deletes a specific post using its ID.
       security:
         - ApiKey: []
       parameters:
-      - name: id
-        in: path
-        required: true
-        description: Post ID
-        schema:
-          type: integer
-        example: 1
+        - name: id
+          in: path
+          required: true
+          description: Post ID
+          schema:
+            type: integer
+          example: 1
       responses:
         '200':
           description: Post deleted successfully
@@ -755,6 +793,8 @@ paths:
           description: Post not found
   /bookings:
     get:
+      tags:
+        - My Bookings
       summary: Get the logged-in user's bookings
       description: Retrieves all bookings belonging to the authenticated user.
       security:
@@ -775,6 +815,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     post:
+      tags:
+        - My Bookings
       summary: Create a new booking
       description: Creates a booking for the authenticated user.
       security:
@@ -786,7 +828,7 @@ paths:
             schema:
               type: object
               required:
-              - sessionId
+                - sessionId
               properties:
                 sessionId:
                   type: integer
@@ -813,18 +855,20 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /bookings/{id}:
     delete:
+      tags:
+        - My Bookings
       summary: Cancel a booking
       description: Deletes a booking using its ID.
       security:
         - ApiKey: []
       parameters:
-      - name: id
-        in: path
-        required: true
-        description: Booking ID
-        schema:
-          type: integer
-        example: 30
+        - name: id
+          in: path
+          required: true
+          description: Booking ID
+          schema:
+            type: integer
+          example: 30
       responses:
         '200':
           description: Booking cancelled successfully
@@ -850,6 +894,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /bookings/xml:
     get:
+      tags:
+        - XML Exports
       summary: Export the logged-in user's bookings as XML
       description: Exports the authenticated user's bookings as XML.
       security:
