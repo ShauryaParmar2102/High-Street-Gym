@@ -123,14 +123,7 @@ export default function PrivacyPolicyView() {
                     It is not a legally reviewed privacy notice.
                 </p>
 
-                <div className="flex justify-center mt-6">
-                    <Link
-                        to="/login"
-                        className="btn border-[#452078] bg-[#452078] text-white hover:bg-[#65429a]"
-                    >
-                        Back to Login
-                    </Link>
-                </div>
+
             </div>
         </main>
     );
