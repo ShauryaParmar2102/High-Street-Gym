@@ -1,6 +1,6 @@
 
 import { useCallback, useEffect, useState } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaCalendarAlt, FaCalendarTimes } from "react-icons/fa";
 import { fetchAPI } from "../api.mjs";
 import { useNavigate } from "react-router";
 import { useAuthenticate } from "../authentication/UseAuthenticate";
@@ -16,6 +16,9 @@ function TimetableView() {
 
     // Store the sessions retrieved from the backend
     const [sessions, setSessions] = useState([]);
+
+    const [isLoading, setIsLoading] = useState(true);
+    
 
     // Check whether a gym session has already started
 const isPastSession = (session) => {
@@ -75,41 +78,48 @@ const [bookedSessionIds, setBookedSessionIds] = useState([]);
         // Add the search filter to the request if one has been entered
         const authKey = localStorage.getItem("auth-key");
 
+        setIsLoading(true);
+setError(null);
+
+
 const request =
     searchTerm.length > 0
         ? fetchAPI("GET", "/sessions?filter=" + encodeURIComponent(searchTerm), null, authKey)
         : fetchAPI("GET", "/sessions", null, authKey);
 
-        // Handle the response returned by the backend
-        request
-            .then((response) => {
+// Handle the response returned by the backend
+request
+    .then((response) => {
 
-                 // Check whether the request was successful
-                if (response.status === 200) {
+        // Check whether the API request was successful
+        if (response.status === 200) {
 
-                    // Store the sessions if the API returned results
-                    if (response.body.length > 0) {
-                        setSessions(response.body);
-                        setError(null);
-                    } else {
+            // Store the sessions returned by the backend
+            // An empty array will trigger the new empty state
+            setSessions(Array.isArray(response.body) ? response.body : []);
+            setError(null);
 
-                        // Clear the sessions and display a message if none were found
-                        setSessions([]);
-                        setError("No sessions found.");
-                    }
-                } else {
+        } else {
 
-                     // Display an error message if the request was unsuccessful
-                    setError(response.body?.message || "Failed to load sessions");
-                }
-            })
-            .catch((error) => {
+            // Display an error if the request failed
+            setSessions([]);
+            setError(response.body?.message || "Failed to load sessions.");
+        }
+    })
+    .catch((error) => {
 
-                // Handle errors that occur while making the API request
-                setError(error.message || String(error));
-            });
+        // Handle errors that occur during the API request
+        setSessions([]);
+        setError(error.message || String(error));
+    })
+    .finally(() => {
 
-    }, [searchTerm]);
+        // Stop displaying the loading spinner
+        setIsLoading(false);
+    });
+
+}, [searchTerm]);
+
 
     // Load sessions when the page opens or the search filter changes
     useEffect(() => {
@@ -203,15 +213,24 @@ const request =
         <section className="flex min-h-screen flex-col items-center bg-[#f5f5f5] px-3 pt-5 pb-24 text-neutral-900">
 
             {/* Page heading */}
-            <div className="mb-6 w-full max-w-4xl rounded-xl border border-neutral-200 bg-white p-5 text-center shadow-sm">
-                <h1 className="text-3xl font-bold text-neutral-900">
-                    Gym Timetable
-                </h1>
+<div className="mb-6 w-full max-w-4xl rounded-xl border border-neutral-200 bg-white p-5 text-center shadow-sm">
 
-                <p className="mt-1 text-sm text-neutral-600">
-                    Browse and book your favourite gym sessions.
-                </p>
-            </div>
+    {/* Timetable icon */}
+    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-purple-100">
+        <FaCalendarAlt className="text-2xl text-[#452078]" />
+    </div>
+
+    {/* Page title */}
+    <h1 className="text-3xl font-bold text-[#452078]">
+        Gym Timetable
+    </h1>
+
+    {/* Page description */}
+    <p className="mt-2 text-sm text-neutral-600">
+        Browse and book your favourite gym sessions.
+    </p>
+
+</div>
 
             {/* SEARCH BAR */}
             <div className="mb-5 flex h-[62px] w-full max-w-4xl items-center gap-2 self-stretch rounded-lg border border-neutral-300 bg-[#f8f8f8] p-[5px]">
@@ -231,19 +250,66 @@ const request =
         </button>
     </div>
 
-    {/* ERROR */}
-    {error && (
-        <span className="w-full rounded-xl border border-neutral-200 bg-white p-6 text-center text-sm text-neutral-600 shadow-sm">
+    
+{/* Error Message */}
+{!isLoading && error && (
+    <div
+        role="alert"
+        className="w-full max-w-4xl rounded-xl border border-red-200 bg-red-50 p-5 text-center text-sm text-red-700 shadow-sm"
+    >
+        {error}
+    </div>
+)}
 
-            {error}
-        </span>
-    )}
+    
+{/* Loading State */}
+{isLoading && (
+    <div className="flex w-full justify-center p-8">
+        <span className="loading loading-spinner loading-lg text-[#452078]" />
+    </div>
+)}
 
-    {/* SESSIONS */}
-    {!error && sessions.length == 0 ? (
-        <span className="loading loading-spinner loading-xl"></span>
-    ) : (
-        <ul className="flex w-full max-w-4xl flex-col gap-4">
+{/* Empty State */}
+{!isLoading && !error && sessions.length === 0 && (
+    <div className="w-full max-w-4xl rounded-xl border border-neutral-200 bg-white p-8 text-center shadow-sm">
+
+        {/* Calendar Icon */}
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
+            <FaCalendarTimes className="text-3xl text-[#452078]" />
+        </div>
+
+        {/* Empty State Heading */}
+        <h2 className="text-xl font-bold text-[#452078]">
+            {searchTerm ? "No Matching Sessions" : "No Sessions Available"}
+        </h2>
+
+        {/* Description */}
+        <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-neutral-600">
+            {searchTerm
+                ? "No gym sessions match your search. Try another activity or location."
+                : "There are currently no gym sessions available."}
+        </p>
+
+        {/* Clear Search Button */}
+        {searchTerm && (
+            <button
+                type="button"
+                onClick={() => {
+                    setFilter("");
+                    setSearchTerm("");
+                }}
+                className="btn mt-5 rounded-lg border-[#452078] bg-[#452078] font-semibold text-white hover:border-[#65429a] hover:bg-[#65429a]"
+            >
+                Clear Search
+            </button>
+        )}
+    </div>
+)}
+
+{/* Session Cards */}
+{!isLoading && !error && sessions.length > 0 && (
+    <ul className="flex w-full max-w-4xl flex-col gap-4">
+
             {sessions.map((session) => (
                 <li
                     key={session.session_id}

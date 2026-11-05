@@ -1,5 +1,6 @@
 import {useState, useCallback} from "react";
 import { useNavigate } from "react-router";
+import { FaUserPlus } from "react-icons/fa";
 import {fetchAPI} from "../api.mjs";
 import validator from "validator";
 
@@ -75,14 +76,24 @@ function Register() { // Creates the Register React component
                 }}
                 >
 
-                     <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-neutral-900">
-            Join High Street Gym
-        </h1>
-        <p className="mt-2 text-sm text-neutral-600">
-            Create your account and start your fitness journey.
-        </p>
+            <div className="mb-8 text-center">
+
+    {/* Registration icon */}
+    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-purple-100">
+        <FaUserPlus className="text-2xl text-[#452078]" />
     </div>
+
+    {/* Registration heading */}
+    <h1 className="text-3xl font-bold text-[#452078]">
+        Join High Street Gym
+    </h1>
+
+    {/* Registration description */}
+    <p className="mt-2 text-sm text-neutral-600">
+        Create your account and start your fitness journey.
+    </p>
+
+</div>
 
                         
                     <label className="form-control w-full">

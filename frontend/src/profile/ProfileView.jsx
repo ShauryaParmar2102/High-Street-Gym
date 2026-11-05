@@ -3,6 +3,7 @@ import {useAuthenticate} from "../authentication/UseAuthenticate";
 import { fetchAPI } from "../api.mjs";
 import XMLDownloadButton from "../common/XMLDownloadButton";
 import validator from "validator";
+import { FaUserCircle } from "react-icons/fa";
 
 function ProfileView() {
 
@@ -143,26 +144,33 @@ const [password, setPassword] = useState("");
         return (
         <section className="flex min-h-[calc(100dvh-11rem)] flex-col items-center gap-4 bg-[#f5f5f5] p-4 text-neutral-900">
 
-            {/* HEADER */}
-            <div className="mb-3 w-full rounded-xl border border-neutral-200 bg-white p-5 text-center shadow-sm">
+           {/* HEADER */}
+<div className="mb-3 w-full rounded-xl border border-neutral-200 bg-white p-5 text-center shadow-sm">
 
-                <h1 className="text-3xl font-bold text-neutral-900">
+    {/* Profile icon */}
+    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-purple-100">
+        <FaUserCircle className="text-2xl text-[#452078]" />
+    </div>
 
-                    My Profile
-                </h1>
+    {/* Page title */}
+    <h1 className="text-3xl font-bold text-[#452078]">
+        My Profile
+    </h1>
 
-                    <p className="mt-1 text-sm text-neutral-600">
+    {/* Page description */}
+    <p className="mt-2 text-sm text-neutral-600">
         View and manage your personal information.
     </p>
 
-                <p className="text-sm opacity-60 mt-2">
-                    Role:{" "}
-                    <span className="badge badge-sm border-none bg-neutral-200 font-semibold text-neutral-900">
+    {/* User role */}
+    <p className="mt-2 text-sm opacity-60">
+        Role:{" "}
+        <span className="badge badge-sm border-none bg-neutral-200 font-semibold text-neutral-900">
+            {user.role}
+        </span>
+    </p>
 
-                        {user.role}
-                    </span>
-                </p>
-            </div>
+</div>
 
             {/* PERSONAL DETAILS */}
             <fieldset className="fieldset self-stretch rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">

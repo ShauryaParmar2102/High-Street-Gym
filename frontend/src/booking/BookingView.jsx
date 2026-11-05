@@ -2,6 +2,7 @@ import {useState, useCallback, useEffect} from "react";
 import {useNavigate} from "react-router";
 import {fetchAPI} from "../api.mjs";
 import XMLDownloadButton from "../common/XMLDownloadButton";
+import { FaCalendarCheck } from "react-icons/fa";
 
 function BookingView() {
 
@@ -141,14 +142,24 @@ useEffect(() => {
 return (
 <section className="min-h-screen bg-[#f5f5f5] text-neutral-900 px-4 sm:px-6 lg:px-8 py-6 pb-28">
 
-    {/* Page heading */}
+{/* Page heading */}
 <div className="mb-6 rounded-xl border border-neutral-200 bg-white p-5 text-center shadow-sm">
-    <h1 className="text-3xl font-bold text-neutral-900">
+
+    {/* Bookings icon */}
+    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-purple-100">
+        <FaCalendarCheck className="text-2xl text-[#452078]" />
+    </div>
+
+    {/* Page title */}
+    <h1 className="text-3xl font-bold text-[#452078]">
         My Bookings
     </h1>
-    <p className="text-sm text-black-400 mt-1">
+
+    {/* Page description */}
+    <p className="mt-2 text-sm text-neutral-600">
         View and manage your scheduled gym sessions.
     </p>
+
 </div>
 
 {/* MEMBER XML */}

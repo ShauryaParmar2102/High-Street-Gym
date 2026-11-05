@@ -1,7 +1,7 @@
 import { useEffect,useState, useCallback } from "react";
 import { fetchAPI } from "../api.mjs";
 import { useAuthenticate } from "../authentication/UseAuthenticate";
-import { MdDelete, MdAdd } from "react-icons/md";
+import { MdDelete, MdAdd, MdArticle } from "react-icons/md";
 
 function BlogView() {
     const { user } = useAuthenticate();
@@ -206,15 +206,25 @@ function BlogView() {
             <section className="min-h-screen bg-[#f5f5f5] p-4 text-neutral-900">
 
         {/* Page heading */}
-        <div className="mb-6 w-full max-w-4xl rounded-xl border border-neutral-200 bg-white p-5 text-center shadow-sm">
-            <h1 className="text-3xl font-bold text-neutral-900">
-                Gym Blog
-            </h1>
+{/* Page heading */}
+<div className="mb-6 w-full max-w-4xl rounded-xl border border-neutral-200 bg-white p-5 text-center shadow-sm">
 
-            <p className="mt-1 text-sm text-neutral-600">
-                Stay updated with the latest gym news and announcements.
-            </p>
-        </div>
+    {/* Blog icon */}
+    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-purple-100">
+        <MdArticle className="text-2xl text-[#452078]" />
+    </div>
+
+    {/* Page title */}
+    <h1 className="text-3xl font-bold text-[#452078]">
+        Gym Blog
+    </h1>
+
+    {/* Page description */}
+    <p className="mt-2 text-sm text-neutral-600">
+        Stay updated with the latest gym news and announcements.
+    </p>
+
+</div>
              
              {/* Navigation */}
              <div className="navbar mb-5 w-full max-w-4xl rounded-xl border border-neutral-200 bg-white px-5 shadow-sm">

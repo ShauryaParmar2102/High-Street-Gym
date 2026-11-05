@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { FaUserPlus } from "react-icons/fa";
+import { FaLock } from "react-icons/fa";
 import { FaRightToBracket } from "react-icons/fa6";
 import { useAuthenticate } from "./UseAuthenticate";
 import { useNavigate } from "react-router";
@@ -40,11 +41,23 @@ function LoginView() {
             <div className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-6 text-neutral-900 shadow-lg sm:p-8">
                 <div className="card-body flex justify-center">
                     <div className="mb-4 text-center">
-                        <h1 className="text-3xl font-bold text-neutral-900">Login</h1>
-                        <p className="mt-2 text-sm text-neutral-600">
-                            Welcome back! Sign in to your account.
-                        </p>
-                    </div>
+
+    {/* Login icon */}
+    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-purple-100">
+        <FaLock className="text-2xl text-[#452078]" />
+    </div>
+
+    {/* Login heading */}
+    <h1 className="text-3xl font-bold text-[#452078]">
+        Login
+    </h1>
+
+    {/* Login description */}
+    <p className="mt-2 text-sm text-neutral-600">
+        Welcome back! Sign in to your account.
+    </p>
+
+</div>
 
                         <form
                             onSubmit={onLoginSubmit}

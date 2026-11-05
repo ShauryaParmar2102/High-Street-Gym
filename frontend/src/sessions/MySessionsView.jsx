@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FaSearch, FaTimes, FaTrash } from "react-icons/fa";
+import { FaSearch, FaTimes, FaTrash, FaCalendarAlt, FaCalendarTimes  } from "react-icons/fa";
 import { fetchAPI } from "../api.mjs";
 import XMLDownloadButton from "../common/XMLDownloadButton";
 
@@ -704,16 +704,23 @@ const formatDate = (date) => {
     return(
   <section className="mx-auto flex min-h-screen w-full min-w-0 flex-col gap-4 bg-[#f5f5f5] px-3 pt-5 pb-24 font-sans text-neutral-900">
 
-    {/* Page Heading */}
-    <div className="w-full rounded-xl border border-neutral-200 bg-white p-5 text-center shadow-sm">
-      <h1 className="text-3xl font-bold text-neutral-900">
-        My Sessions
-      </h1>
+{/* Page Heading */}
+<div className="w-full rounded-xl border border-neutral-200 bg-white p-5 text-center shadow-sm">
 
-      <p className="mt-2 text-sm text-neutral-600">
-         View your scheduled gym sessions.
-      </p>
-    </div>
+  {/* Trainer sessions icon */}
+  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-purple-100">
+    <FaCalendarAlt className="text-2xl text-[#452078]" />
+  </div>
+
+  <h1 className="text-3xl font-bold text-[#452078]">
+    My Sessions
+  </h1>
+
+  <p className="mt-2 text-sm text-neutral-600">
+    View and manage your scheduled gym sessions.
+  </p>
+
+</div>
          
             
             {/* Error Message */}
@@ -801,11 +808,45 @@ const formatDate = (date) => {
             </div>
           )}
 
-          {!isLoading && !error && filteredSessions.length === 0 && (
-            <div className="rounded-xl bg-base-100 p-6 text-center text-sm text-base-content/60 shadow/sm">
-                 No sessions found.
-              </div>
-          )}
+          
+{/* Empty State */}
+{!isLoading && !error && filteredSessions.length === 0 && (
+  <div className="w-full rounded-xl border border-neutral-200 bg-white p-8 text-center shadow-sm">
+
+    {/* Calendar icon */}
+    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
+      <FaCalendarTimes className="text-3xl text-[#452078]" />
+    </div>
+
+    {/* Empty state heading */}
+    <h2 className="text-xl font-bold text-[#452078]">
+      {searchTerm ? "No Matching Sessions" : "No Sessions Available"}
+    </h2>
+
+    {/* Description */}
+    <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-neutral-600">
+      {searchTerm
+        ? "No gym sessions match your search. Try another activity, location or date."
+        : "You don't have any scheduled gym sessions to display yet."}
+    </p>
+
+    {/* Clear Search */}
+    {searchTerm && (
+      <button
+        type="button"
+        onClick={() => {
+          setFilter("");
+          setSearchTerm("");
+        }}
+        className="btn mt-5 rounded-lg border-[#452078] bg-[#452078] font-semibold text-white hover:border-[#65429a] hover:bg-[#65429a]"
+      >
+        Clear Search
+      </button>
+    )}
+
+  </div>
+)}
+
 
           {!isLoading && 
             filteredSessions.map((session) => (
