@@ -1,10 +1,27 @@
 // Import the parent DatabaseModel class which contains shared database methods
 import { DatabaseModel } from "./DatabaseModel.mjs";
 
-// Define the ActivityModel class and inherit database functionality
+/**
+ * Represents a gym activity in the High Street Gym system.
+ *
+ * Extends DatabaseModel to manage activity data in MySQL.
+ * Allows activities to be created, retrieved, updated and deleted.
+ *
+ * Also provides methods for deleting related bookings
+ * and sessions when an activity is removed.
+ */
 export class ActivityModel extends DatabaseModel {
 
-        // Constructor creates a new Activity object
+    /**
+     * Creates a new ActivityModel instance.
+     *
+     * Stores the activity's ID, name and description.
+     *
+     * @constructor
+     * @param {number} id - The unique ID of the activity.
+     * @param {string} name - The name of the gym activity.
+     * @param {string} description - A description of the activity.
+     */
     constructor(id, name, description) {
         super(); //Call parent class constructor
 
@@ -13,7 +30,16 @@ export class ActivityModel extends DatabaseModel {
         this.name = name;
         this.description = description;
     }
-        // Convert a database row into an ActivityModel object
+    /**
+     * Converts a database row into an ActivityModel object.
+     *
+     * Uses the activity ID, name and description returned
+     * from the activities table.
+     *
+     * @static
+     * @param {Object} row - The database row containing activity information.
+     * @returns {ActivityModel} A new ActivityModel object containing the activity details.
+     */
     static tableToModel(row) {
         return new ActivityModel(
             row.activity_id,
@@ -21,7 +47,17 @@ export class ActivityModel extends DatabaseModel {
             row.description
         );
     }
-    // Fetches all activities from the MySQL activities table
+    /**
+     * Retrieves all gym activities from the MySQL database.
+     *
+     * Executes a SELECT query on the activities table
+     * and converts each returned row into an ActivityModel object.
+     *
+     * @static
+     * @async
+     * @returns {Promise<ActivityModel[]>} A promise resolving
+     * to an array of all gym activities.
+     */
     static async getAll() {
             // SELECT retrieves all columns from the activities table
         return this.query(`
@@ -30,7 +66,20 @@ export class ActivityModel extends DatabaseModel {
             results.map((row) => this.tableToModel(row))
         );
     }
-        //Retrieve a single activity by ID
+    /**
+     * Retrieves a gym activity using its unique ID.
+     *
+     * Uses a parameterised SQL query to find the
+     * matching activity in the database.
+     *
+     * Returns null if the activity does not exist.
+     *
+     * @static
+     * @async
+     * @param {number} id - The unique ID of the activity.
+     * @returns {Promise<ActivityModel|null>} A promise resolving
+     * to the matching activity or null if not found.
+     */
     static async getById(id) {
         return this.query(
             `
@@ -43,7 +92,18 @@ export class ActivityModel extends DatabaseModel {
         );
     }
 
-    // Adds a new activity to the MySQL activities table
+    /**
+     * Creates a new gym activity in the MySQL database.
+     *
+     * Uses an INSERT query to save the activity's
+     * name and description in the activities table.
+     *
+     * @static
+     * @async
+     * @param {ActivityModel} activity - The activity details to insert.
+     * @returns {Promise<Object>} A promise resolving
+     * to the database INSERT query result.
+     */
     static async create(activity) {
         return this.query(
             // INSERT command adds the activity name and description to the activities table
@@ -56,7 +116,18 @@ export class ActivityModel extends DatabaseModel {
         );
     }
 
-    // Updates an existing activity in the MySQL activities table using its ID
+    /**
+     * Updates an existing gym activity in the database.
+     *
+     * Uses a parameterised UPDATE query to change
+     * the activity's name and description using its ID.
+     *
+     * @static
+     * @async
+     * @param {ActivityModel} activity - The updated activity details.
+     * @returns {Promise<Object>} A promise resolving
+     * to the database UPDATE query result.
+     */
     static async update(activity) {
         return this.query(
             `
@@ -68,7 +139,21 @@ export class ActivityModel extends DatabaseModel {
         );
     }
 
-// Deletes bookings linked to sessions that use the activity before deleting the activity
+/**
+ * Deletes bookings associated with a specific gym activity.
+ *
+ * Finds sessions belonging to the activity and removes
+ * any bookings that reference those sessions.
+ *
+ * This helps prevent foreign key issues when
+ * deleting activities and their related sessions.
+ *
+ * @static
+ * @async
+ * @param {number} id - The unique ID of the activity.
+ * @returns {Promise<Object>} A promise resolving
+ * to the database DELETE query result.
+ */
 static async deleteRelatedBookings(id) {
     return this.query(
         `
@@ -84,7 +169,18 @@ static async deleteRelatedBookings(id) {
     );
 }
 
-// Delete all sessions that are using this activity
+/**
+ * Deletes all gym sessions associated with an activity.
+ *
+ * Uses a DELETE query to remove sessions that
+ * reference the specified activity ID.
+ *
+ * @static
+ * @async
+ * @param {number} id - The unique ID of the activity.
+ * @returns {Promise<Object>} A promise resolving
+ * to the database DELETE query result.
+ */
 static async deleteRelatedSessions(id) {
     return this.query(
         `
@@ -95,7 +191,18 @@ static async deleteRelatedSessions(id) {
     );
 }
 
-// Delete an activity from the database by its ID
+/**
+ * Permanently deletes a gym activity from the database.
+ *
+ * Uses a parameterised DELETE query to remove
+ * the activity with the matching activity ID.
+ *
+ * @static
+ * @async
+ * @param {number} id - The unique ID of the activity to delete.
+ * @returns {Promise<Object>} A promise resolving
+ * to the database DELETE query result.
+ */
 static async delete(id) {
     return this.query(
         `

@@ -1,9 +1,33 @@
 import { DatabaseModel } from "./DatabaseModel.mjs";
 // UserModel handles all database operations for the users table
 
+/**
+ * Represents a user in the High Street Gym system.
+ *
+ * Extends DatabaseModel to manage user data in MySQL.
+ * Allows users to be created, retrieved, updated and deleted.
+ *
+ * Also provides methods for finding users by their ID,
+ * email address, authentication key and assigned role.
+ */
 export class UserModel extends DatabaseModel {
     
-        // Constructor - creates a User object
+    /**
+     * Creates a new UserModel instance.
+     *
+     * Stores the user's ID, first name, last name, email,
+     * password hash, role, creation date and authentication key.
+     *
+     * @constructor
+     * @param {number} id - The unique ID of the user.
+     * @param {string} firstName - The user's first name.
+     * @param {string} lastName - The user's last name.
+     * @param {string} email - The user's email address.
+     * @param {string} passwordHash - The user's hashed password.
+     * @param {string} role - The user's assigned role.
+     * @param {Date|string} createdAt - The date the account was created.
+     * @param {string|null} [authenticationKey=null] - The user's authentication key.
+     */
     constructor(
         id, 
         firstName, 
@@ -27,7 +51,18 @@ export class UserModel extends DatabaseModel {
         this.authenticationKey = authenticationKey;
     }
 
-        // Converts a database row into a UserModel object
+    /**
+     * Converts a database row into a UserModel object.
+     *
+     * Retrieves the user information from the database row
+     * and creates a new UserModel instance.
+     *
+     * Supports rows containing nested user information.
+     *
+     * @static
+     * @param {Object} row - The database row containing user information.
+     * @returns {UserModel} A new UserModel object containing the user details.
+     */
     static tableToModel(row) {
         const userRow = row.user || row.users || row;
         return new UserModel(
@@ -43,7 +78,17 @@ export class UserModel extends DatabaseModel {
         );
     }
 
-        // Gets all users from the database
+    /**
+     * Retrieves all users from the MySQL database.
+     *
+     * Executes a SELECT query on the users table
+     * and converts each returned row into a UserModel object.
+     *
+     * @static
+     * @async
+     * @returns {Promise<UserModel[]>} A promise resolving
+     * to an array of all registered users.
+     */
     static async getAll() {
 
          // Run the SQL query and return the database result
@@ -54,7 +99,21 @@ export class UserModel extends DatabaseModel {
         });
     }
 
-    //Gets a user by ID
+    
+    /**
+     * Retrieves a user from the database using their unique ID.
+     *
+     * Uses a parameterised SQL query to find the matching
+     * user record in the users table.
+     *
+     * Returns null if the user does not exist.
+     *
+     * @static
+     * @async
+     * @param {number} id - The unique ID of the user.
+     * @returns {Promise<UserModel|null>} A promise resolving
+     * to the matching user or null if not found.
+     */
     static async getById(id) {
 
          // Run the SQL query and return the database result
@@ -71,7 +130,21 @@ export class UserModel extends DatabaseModel {
 
     // ==================== CHECK IF EMAIL ALREADY EXISTS ====================
 
-    // Check if an email address is already registered in the database
+    /**
+     * Retrieves a user using their email address.
+     *
+     * Searches the users table for an existing account
+     * with the specified email address.
+     *
+     * Can be used to check whether an email is already
+     * registered before creating a new user account.
+     *
+     * @static
+     * @async
+     * @param {string} email - The email address to search for.
+     * @returns {Promise<UserModel|null>} A promise resolving
+     * to the matching user or null if the email is not found.
+     */
     static async getByEmail(email) {
         
         // Run the SELECT query and return the database result
@@ -101,7 +174,21 @@ export class UserModel extends DatabaseModel {
         });
     }
 
-// Find a user using their authentication key
+/**
+ * Retrieves a user using their authentication key.
+ *
+ * Searches the users table for an account with
+ * the supplied authentication key.
+ *
+ * Returns the matching user if the key exists,
+ * otherwise returns null.
+ *
+ * @static
+ * @async
+ * @param {string} authenticationKey - The authentication key used to find the user.
+ * @returns {Promise<UserModel|null>} A promise resolving
+ * to the matching user or null if the key is not found.
+ */
 static async getByAuthenticationKey(authenticationKey) {
     const results = await this.query(
         `
@@ -121,7 +208,19 @@ static async getByAuthenticationKey(authenticationKey) {
     return null;
     }
 
-    // Get all users that have a specific role
+    /**
+     * Retrieves all users assigned to a specific role.
+     *
+     * Uses a parameterised SQL query to find users
+     * whose role matches the supplied value.
+     *
+     * Converts each returned database row into a UserModel object.
+     *
+     * @static
+     * @param {string} role - The user role to search for.
+     * @returns {Promise<UserModel[]>} A promise resolving
+     * to an array of users with the specified role.
+     */
     static getByRole(role) {
 
          // Run the SQL query and return the database result
@@ -133,7 +232,18 @@ static async getByAuthenticationKey(authenticationKey) {
         );
     }
 
-    // Creates and stores a new user in the MySQL database
+    /**
+     * Creates a new user account in the MySQL database.
+     *
+     * Uses an INSERT query to save the user's first name,
+     * last name, email, password hash, role and authentication key.
+     *
+     * @static
+     * @async
+     * @param {UserModel} user - The user details to insert.
+     * @returns {Promise<Object>} A promise resolving
+     * to the database INSERT query result.
+     */
     static async create(user) {
 
          // Run the SQL query and return the database result
@@ -163,8 +273,22 @@ static async getByAuthenticationKey(authenticationKey) {
         );
     }
     
-    //Updates User
-    // Updates the selected user's details in the MySQL database
+    
+    /**
+     * Updates an existing user account in the database.
+     *
+     * Uses a parameterised UPDATE query to change
+     * the user's personal information, password hash,
+     * assigned role and authentication key.
+     *
+     * Identifies the account using its unique user ID.
+     *
+     * @static
+     * @async
+     * @param {UserModel} user - The updated user details.
+     * @returns {Promise<Object>} A promise resolving
+     * to the database UPDATE query result.
+     */
     static async update(user){
 
          // Run the SQL query and return the database result
@@ -192,7 +316,19 @@ static async getByAuthenticationKey(authenticationKey) {
         ]
       );
     }
-    // Permanently delete a user from the database using their ID
+    
+    /**
+     * Permanently deletes a user account from the database.
+     *
+     * Uses a parameterised DELETE query to remove
+     * the user with the specified user ID.
+     *
+     * @static
+     * @async
+     * @param {number} id - The unique ID of the user to delete.
+     * @returns {Promise<Object>} A promise resolving
+     * to the database DELETE query result.
+     */
     static async delete(id) {
 
          // Run the SQL query and return the database result

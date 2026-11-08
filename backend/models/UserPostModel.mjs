@@ -2,17 +2,45 @@ import { DatabaseModel } from "./DatabaseModel.mjs";
 import { UserModel } from "./UserModel.mjs";
 import { PostModel } from "./PostModel.mjs";
 
-// Combines post data with the user who created the post
+/**
+ * Represents a community blog post together with its author.
+ *
+ * Extends DatabaseModel to retrieve post and user data
+ * from the High Street Gym MySQL database.
+ *
+ * Provides methods for retrieving posts with their
+ * related user information and filtering posts by user role.
+ */
 export class UserPostModel extends DatabaseModel {
 
-    // Create a UserPostModel object containing post and user data
+    /**
+     * Creates a new UserPostModel instance.
+     *
+     * Stores the post information together with
+     * the user who created the post.
+     *
+     * @constructor
+     * @param {PostModel} posts - The post containing its details.
+     * @param {UserModel} users - The user who created the post.
+     */
     constructor(posts, users) {
         super(); //Call parent class constructor
         this.posts = posts;
         this.users = users;
     }
 
-    // Convert joined database rows into PostModel and UserModel objects
+    /**
+     * Converts a joined database row into a UserPostModel object.
+     *
+     * Uses the tableToModel methods from PostModel and UserModel
+     * to convert the post and user data into model objects.
+     *
+     * Combines both objects into a new UserPostModel instance.
+     *
+     * @static
+     * @param {Object} row - The database row containing post and user information.
+     * @returns {UserPostModel} A new object containing the post and its author.
+     */
     static tableToModel(row) {
         return new UserPostModel(
             PostModel.tableToModel(row.posts),
@@ -20,7 +48,19 @@ export class UserPostModel extends DatabaseModel {
         );
     }
 
-    // Get all posts together with the user who created each post
+    /**
+     * Retrieves all community blog posts with their authors.
+     *
+     * Uses an INNER JOIN to connect the posts and users tables
+     * using the user ID associated with each post.
+     *
+     * Converts each returned database row into a UserPostModel object.
+     *
+     * @static
+     * @async
+     * @returns {Promise<UserPostModel[]>} A promise resolving
+     * to an array of posts with their related user details.
+     */
     static async getAll() {
 
          // Join the posts and users tables using user_id
@@ -39,7 +79,20 @@ export class UserPostModel extends DatabaseModel {
         return results.map((row) => this.tableToModel(row));
     }
 
-     // Get one post by ID together with the user who created it
+    /**
+     * Retrieves a community blog post using its unique ID.
+     *
+     * Uses an INNER JOIN to retrieve the selected post
+     * together with the user who created it.
+     *
+     * Returns null if the post does not exist.
+     *
+     * @static
+     * @async
+     * @param {number} id - The unique ID of the post.
+     * @returns {Promise<UserPostModel|null>} A promise resolving
+     * to the matching post and author or null if not found.
+     */
     static async getById(id) {
 
         // Join the post with its matching user and find the selected post
@@ -70,8 +123,23 @@ export class UserPostModel extends DatabaseModel {
         return this.tableToModel(results[0]);
     }
 
-     // Get all posts created by users with a specific role
-      static async getAllByRole(role) {
+     /**
+     * Retrieves community blog posts created by users with a specific role.
+     *
+     * Uses an INNER JOIN to connect posts with their authors
+     * and filters the results using the selected user role.
+     *
+     * Orders posts by creation date in descending order.
+     *
+     * Converts each matching row into a UserPostModel object.
+     *
+     * @static
+     * @async
+     * @param {string} role - The user role used to filter posts.
+     * @returns {Promise<UserPostModel[]>} A promise resolving
+     * to an array of posts created by users with the specified role.
+     */
+    static async getAllByRole(role) {
 
         // Join posts with users and filter the results by user role
         const results = await this.query(

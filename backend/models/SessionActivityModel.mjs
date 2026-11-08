@@ -5,8 +5,30 @@ import { SessionModel } from "./SessionModel.mjs";
 import { UserModel } from "./UserModel.mjs";
 
 // Model used for returning a session with its related activity, location and user
+
+/**
+ * Represents a gym session together with its related activity,
+ * location and trainer information.
+ *
+ * Extends DatabaseModel to retrieve session data from MySQL.
+ */
 export class SessionActivityModel extends DatabaseModel{
 
+    /**
+     * Creates a new SessionActivityModel instance.
+     *
+     * Stores the session information together with its related
+     * activity, location and trainer objects.
+     *
+     * Each object is created using its corresponding model class.
+     *
+     * @constructor
+     * @param {SessionModel} session - The session containing its ID, date, times and capacity.
+     * @param {ActivityModel} activity - The activity associated with the session.
+     * @param {LocationModel} location - The location where the session is scheduled.
+     * @param {UserModel} user - The trainer assigned to the session.
+     */
+    
     constructor(session, activity, location, user) {
         super(); // Call the parent DatabaseModel constructor
         // Store each related object
@@ -18,7 +40,19 @@ export class SessionActivityModel extends DatabaseModel{
 
     // ==================== CONVERT DATABASE ROW TO MODEL ====================
 
-    // Convert a database row into a SessionActivityModel object
+    /**
+     * Converts a database row into a SessionActivityModel object.
+     *
+     * Takes a row returned from a SQL query containing joined
+     * session, activity, location and user information.
+     *
+     * Uses the tableToModel method from each related model
+     * to convert the row into individual model objects.
+     *
+     * @static
+     * @param {Object} row - The database row containing session and related table fields.
+     * @returns {SessionActivityModel} A new object containing the converted models.
+     */
     static tableToModel(row) {
 
     // Convert each part of the joined database row using its related model
@@ -32,7 +66,18 @@ export class SessionActivityModel extends DatabaseModel{
 
     // ==================== BASE SQL QUERY ====================
 
-    // Base SQL query used to retrieve a session and its related data
+    /**
+     * Returns the base SQL query used to retrieve gym sessions.
+     *
+     * Uses INNER JOIN statements to connect the sessions table
+     * with the activities, locations and users tables.
+     *
+     * The tables are joined using their related foreign keys
+     * so each session includes its activity, location and trainer.
+     *
+     * @static
+     * @returns {string} The SQL SELECT statement for retrieving joined session data.
+     */
     static baseQuery() {
     return `
     SELECT *
@@ -53,7 +98,18 @@ export class SessionActivityModel extends DatabaseModel{
 
     // ==================== DATABASE DATA RETRIEVAL ====================
     
-    // Retrieve all sessions with their activity, location and trainer details
+    /**
+     * Retrieves all gym sessions from the MySQL database.
+     *
+     * Executes the SQL query returned by baseQuery().
+     *
+     * Converts each database row into a SessionActivityModel
+     * object using the tableToModel() method.
+     *
+     * @static
+     * @returns {Promise<SessionActivityModel[]>} A promise resolving to an array
+     * of session objects containing their related activity, location and trainer.
+     */
     static getAll() {
 
         // Run the SQL query to retrieve sessions and their related details from MySQL
@@ -66,7 +122,21 @@ export class SessionActivityModel extends DatabaseModel{
 
     // ==================== GET SESSIONS BY TRAINER ====================
 
-    // Retrieve sessions belonging to one specific trainer/user
+    /**
+     * Retrieves gym sessions assigned to a specific trainer.
+     *
+     * Uses the base SQL query and adds a WHERE condition
+     * to filter sessions using the trainer's user ID.
+     *
+     * Uses a parameterised SQL query to safely pass the user ID.
+     *
+     * Converts each returned row into a SessionActivityModel object.
+     *
+     * @static
+     * @param {number} userId - The unique ID of the trainer.
+     * @returns {Promise<SessionActivityModel[]>} A promise resolving to
+     * an array of sessions assigned to the specified trainer.
+     */
     static getByUserId(userId) {
 
     // Add a WHERE condition to the base query to only get a specific trainer's sessions
@@ -82,8 +152,34 @@ export class SessionActivityModel extends DatabaseModel{
 
     // ==================== GET SESSIONS WITH DETAILS AND FILTERING ====================
 
-    // Retrieve all sessions with their related details
-    // An optional filter can be used to search the sessions
+    /**
+     * Retrieves gym sessions with their related activity,
+     * location and trainer information.
+     *
+     * Builds a SQL query that joins the sessions, activities,
+     * locations and users tables.
+     *
+     * Supports optional searching by activity name, location
+     * name or the trainer's full name.
+     *
+     * When a trainer ID is provided, only sessions belonging
+     * to that trainer are retrieved.
+     *
+     * Uses parameterised SQL queries to safely handle
+     * search values and trainer IDs.
+     *
+     * Orders the sessions by date in descending order.
+     *
+     * Converts the database results into simplified objects
+     * containing session IDs, names, dates, times and capacity.
+     *
+     * @static
+     * @async
+     * @param {string} [filter=""] - Optional text used to search for gym sessions.
+     * @param {number|null} [trainerId=null] - Optional trainer ID used to filter sessions.
+     * @returns {Promise<Object[]>} A promise resolving to an array
+     * of session objects with their related details.
+     */
     static async getAllWithDetails(filter = "", trainerId = null) {
         let query = `
         SELECT

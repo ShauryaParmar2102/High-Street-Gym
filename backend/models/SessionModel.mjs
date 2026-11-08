@@ -1,8 +1,32 @@
 import { DatabaseModel } from "./DatabaseModel.mjs";
 
+/**
+ * Represents a gym session in the High Street Gym system.
+ *
+ * Extends DatabaseModel to manage session data in MySQL.
+ * Allows sessions to be created, retrieved, updated and deleted.
+ *
+ * Also provides methods for finding duplicate sessions
+ * and retrieving sessions with related details.
+ */
 export class SessionModel extends DatabaseModel {
 
-    // Constructor creates a SessionModel object with all session information
+    /**
+     * Creates a new SessionModel instance.
+     *
+     * Stores the session's ID, activity, trainer, location,
+     * date, start time, end time and capacity.
+     *
+     * @constructor
+     * @param {number} id - The unique ID of the session.
+     * @param {number} activityId - The ID of the activity.
+     * @param {number} trainerId - The ID of the assigned trainer.
+     * @param {number} locationId - The ID of the session location.
+     * @param {string|Date} sessionDate - The date of the session.
+     * @param {string} startTime - The session start time.
+     * @param {string} endTime - The session end time.
+     * @param {number} capacity - The maximum number of participants.
+     */
     constructor(
         id,
         activityId,
@@ -25,7 +49,17 @@ export class SessionModel extends DatabaseModel {
         this.endTime = endTime;
         this.capacity = capacity;
     }
-    // Convert a database row into a SessionModel object
+    
+    /**
+     * Converts a database row into a SessionModel object.
+     *
+     * Uses the session values returned from the database
+     * and formats the start and end times to HH:MM.
+     *
+     * @static
+     * @param {Object} row - The database row containing session information.
+     * @returns {SessionModel} A new SessionModel object containing the session details.
+     */
     static tableToModel(row) {
 
         // Use the sessions data if it exists, otherwise use the row directly
@@ -46,7 +80,17 @@ export class SessionModel extends DatabaseModel {
         r.capacity,
     );
 }
-    //Get all sessions from the database
+    /**
+     * Retrieves all gym sessions from the MySQL database.
+     *
+     * Orders the sessions by date in descending order
+     * and converts each database row into a SessionModel object.
+     *
+     * @static
+     * @async
+     * @returns {Promise<SessionModel[]>} A promise resolving
+     * to an array of all gym sessions.
+     */
     static async getAll() {
         const rows = await this.query(`
             SELECT *
@@ -58,7 +102,20 @@ export class SessionModel extends DatabaseModel {
             return rows.map((row) => this.tableToModel(row));
     }
 
-    // Get one session using its ID
+    /**
+     * Retrieves a gym session using its unique ID.
+     *
+     * Executes a parameterised SQL query to find the
+     * matching session in the database.
+     *
+     * Returns null if the session does not exist.
+     *
+     * @static
+     * @async
+     * @param {number} id - The unique ID of the session.
+     * @returns {Promise<SessionModel|null>} A promise resolving
+     * to the matching session or null if not found.
+     */
     static async getById(id) {
         const rows = await this.query(
             `
@@ -75,7 +132,21 @@ export class SessionModel extends DatabaseModel {
         return this.tableToModel(rows[0]);
     }
 
-    // Find an existing session with the same details
+
+/**
+ * Checks whether a gym session already exists.
+ *
+ * Searches for a session with the same trainer,
+ * location, activity, date, start time and end time.
+ *
+ * Uses a parameterised SQL query to check for duplicates.
+ *
+ * @static
+ * @async
+ * @param {SessionModel} session - The session details to check.
+ * @returns {Promise<SessionModel|null>} A promise resolving
+ * to the duplicate session or null if none exists.
+ */
 static async findDuplicate(session) {
     const rows = await this.query(
         `
@@ -102,7 +173,18 @@ static async findDuplicate(session) {
     return rows.length ? this.tableToModel(rows[0]) : null;
 }
 
-    // Creates a new session using INSERT so bookings can reference its session ID
+    /**
+     * Creates a new gym session in the MySQL database.
+     *
+     * Uses an INSERT query to save the session's trainer,
+     * location, activity, date, times and capacity.
+     *
+     * @static
+     * @async
+     * @param {SessionModel} session - The session details to insert.
+     * @returns {Promise<Object>} A promise resolving
+     * to the database INSERT query result.
+     */
     static async create(session) {
 
         // Run the INSERT query and return the database result
@@ -126,7 +208,18 @@ static async findDuplicate(session) {
         );
     }
 
-    // Update an existing session
+    /**
+     * Updates an existing gym session in the database.
+     *
+     * Uses a parameterised UPDATE query to change the
+     * session details using its unique session ID.
+     *
+     * @static
+     * @async
+     * @param {SessionModel} session - The updated session details.
+     * @returns {Promise<Object>} A promise resolving
+     * to the database UPDATE query result.
+     */
     static async update(session) {
 
          // Run the UPDATE query and return the database result
@@ -151,7 +244,18 @@ static async findDuplicate(session) {
         );
     }
 
-    // Deletes all sessions belonging to a trainer when their account is deleted
+/**
+ * Deletes all gym sessions assigned to a specific trainer.
+ *
+ * Uses a DELETE query to remove sessions belonging
+ * to the trainer when their account is deleted.
+ *
+ * @static
+ * @async
+ * @param {number} trainerId - The unique ID of the trainer.
+ * @returns {Promise<Object>} A promise resolving
+ * to the database DELETE query result.
+ */
 static async deleteByTrainerId(trainerId) {
 
      // Run the DELETE query and return the database result
@@ -164,10 +268,20 @@ static async deleteByTrainerId(trainerId) {
     );
 }
 
-// Permanently delete one session by ID.
-// Hard deletes the session from the database.
-// The foreign key prevents deletion if a booking still references this session, protecting referential integrity.
-// The booking must be removed by an admin before the trainer can delete the session.
+/**
+ * Permanently deletes a gym session using its ID.
+ *
+ * Uses a parameterised DELETE query to remove the session.
+ *
+ * Foreign key constraints prevent deletion when
+ * existing bookings still reference the session.
+ *
+ * @static
+ * @async
+ * @param {number} id - The unique ID of the session to delete.
+ * @returns {Promise<Object>} A promise resolving
+ * to the database DELETE query result.
+ */
 static async delete(id) {
     return this.query(
         `
@@ -178,8 +292,23 @@ static async delete(id) {
     );
 }
 
-// Get all sessions with trainer, location and activity details
-    static async getAllWithDetails() {
+/**
+ * Retrieves all gym sessions with their related details.
+ *
+ * Uses INNER JOIN statements to retrieve session,
+ * trainer, location and activity information.
+ *
+ * Orders the sessions by date in descending order.
+ *
+ * Converts each database row into an object containing
+ * the session and its related trainer, location and activity.
+ *
+ * @static
+ * @async
+ * @returns {Promise<Object[]>} A promise resolving to an
+ * array of session objects with their related details.
+ */
+static async getAllWithDetails() {
 
 // Fetch session records and join related tables so readable details like 
 // trainer name, location name and activity name can be returned

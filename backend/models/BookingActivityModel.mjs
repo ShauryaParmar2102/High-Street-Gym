@@ -2,9 +2,35 @@
 // BookingActivityModel inherits the database query functionality from this class.
 import { DatabaseModel } from "./DatabaseModel.mjs";
 
+/**
+ * Manages the retrieval of gym bookings with related details.
+ *
+ * Extends DatabaseModel to retrieve booking data from MySQL.
+ *
+ * Provides methods for retrieving a member's active bookings,
+ * retrieving all bookings with their session, activity and
+ * location information, and finding a booking by its ID.
+ */
 export class BookingActivityModel extends DatabaseModel {
 
-    // Gets all active bookings for a specific member.
+    
+    /**
+     * Retrieves all active bookings belonging to a specific member.
+     *
+     * Uses INNER JOIN statements to retrieve booking information
+     * together with the related session, activity and location.
+     *
+     * Only returns bookings with a status of 'booked'.
+     *
+     * Converts each database row into an object containing
+     * the booking and its related details.
+     *
+     * @static
+     * @async
+     * @param {number} memberId - The unique ID of the member.
+     * @returns {Promise<Object[]>} A promise resolving to an array
+     * of active bookings with their session, activity and location details.
+     */
     static async getByMember(memberId) {
 
         // Run a SQL query and pass the member ID as a parameter.
@@ -70,10 +96,22 @@ export class BookingActivityModel extends DatabaseModel {
             }
         }));
     }
-
-
-    // Gets all bookings together with their related
-    // session, activity and location information.
+    /**
+     * Retrieves all gym bookings with their related information.
+     *
+     * Uses INNER JOIN statements to connect the bookings,
+     * sessions, activities and locations tables.
+     *
+     * Converts each returned database row into an object
+     * containing the booking, session, activity and location.
+     *
+     * Includes bookings regardless of their booking status.
+     *
+     * @static
+     * @async
+     * @returns {Promise<Object[]>} A promise resolving to an array
+     * of bookings with their related session, activity and location details.
+     */
     static async getWithDetails() {
         const rows = await this.query(`
             SELECT
@@ -131,7 +169,21 @@ export class BookingActivityModel extends DatabaseModel {
             }
         }));
     }
-    // Gets one booking using its booking ID.
+    /**
+     * Retrieves a single gym booking using its unique ID.
+     *
+     * Uses a parameterised SQL query to find the
+     * matching booking in the bookings table.
+     *
+     * Returns the database row if the booking exists,
+     * otherwise returns null.
+     *
+     * @static
+     * @async
+     * @param {number} id - The unique ID of the booking.
+     * @returns {Promise<Object|null>} A promise resolving
+     * to the booking record or null if not found.
+     */
     static async getById(id) {
 
         // The ? placeholder prevents the ID from being inserted

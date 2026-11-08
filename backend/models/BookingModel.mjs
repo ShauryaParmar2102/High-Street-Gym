@@ -1,7 +1,30 @@
 import { DatabaseModel } from "./DatabaseModel.mjs";
 
+/**
+ * Represents a member booking in the High Street Gym system.
+ *
+ * Extends DatabaseModel to manage booking data in MySQL.
+ * Allows bookings to be created, retrieved, updated and deleted.
+ *
+ * Also provides methods for finding existing bookings,
+ * reactivating cancelled bookings and deleting bookings
+ * associated with members, trainers and sessions.
+ */
 export class BookingModel extends DatabaseModel {
 
+    /**
+     * Creates a new BookingModel instance.
+     *
+     * Stores the booking ID, member ID, session ID,
+     * booking status and the date the booking was created.
+     *
+     * @constructor
+     * @param {number} id - The unique ID of the booking.
+     * @param {number} memberId - The ID of the member making the booking.
+     * @param {number} sessionId - The ID of the booked session.
+     * @param {string} bookingStatus - The booking status, booked or cancelled.
+     * @param {Date|string} bookedAt - The date and time the booking was created.
+     */
     constructor(id, memberId, sessionId, bookingStatus, bookedAt) {
     super(); //Call parent class constructor
 
@@ -12,6 +35,16 @@ export class BookingModel extends DatabaseModel {
     this.bookedAt = bookedAt; // Date and time the booking was created
     }
 
+    /**
+     * Converts a database row into a BookingModel object.
+     *
+     * Uses the booking information returned from the database
+     * to create a new BookingModel instance.
+     *
+     * @static
+     * @param {Object} row - The database row containing booking information.
+     * @returns {BookingModel} A new BookingModel object containing the booking details.
+     */
     static tableToModel(row) { // Converts a database row into a BookingModel object
         const b = row.bookings ?? row;     // Use the "bookings" object if it exists, otherwise use the row itself
         return new BookingModel( //Create and Return new bookingModel object
@@ -24,10 +57,15 @@ export class BookingModel extends DatabaseModel {
     }
     
     /**
-     * Retrieves all active bookings from the database.
+     * Retrieves all active bookings from the MySQL database.
      *
+     * Selects bookings with a status of 'booked'
+     * and converts each row into a BookingModel object.
+     *
+     * @static
      * @async
-     * @returns {Promise<Array>} A list of booking records.
+     * @returns {Promise<BookingModel[]>} A promise resolving
+     * to an array of active bookings.
      */
     static async getAll() {
             // Run the SQL query and store the returned database rows in "rows".
@@ -41,6 +79,20 @@ export class BookingModel extends DatabaseModel {
         return rows.map((row) => this.tableToModel(row));
     }
 
+    /**
+     * Retrieves an active booking using its unique ID.
+     *
+     * Uses a parameterised SQL query to find a booking
+     * with the specified ID and a status of 'booked'.
+     *
+     * Returns null if no matching booking exists.
+     *
+     * @static
+     * @async
+     * @param {number} id - The unique ID of the booking.
+     * @returns {Promise<BookingModel|null>} A promise resolving
+     * to the matching booking or null if not found.
+     */
     static async getById(id) { // Get a single active booking by its booking ID
 
             // Run the SQL query and store the returned rows.
@@ -53,7 +105,20 @@ export class BookingModel extends DatabaseModel {
             // If no booking was found, return null.
         return rows.length ? this.tableToModel(rows[0]) : null;
     }
-    // Get all active bookings belonging to a specific member.
+    /**
+     * Retrieves all active bookings belonging to a member.
+     *
+     * Uses a parameterised SQL query to find bookings
+     * with the specified member ID and a status of 'booked'.
+     *
+     * Converts each returned row into a BookingModel object.
+     *
+     * @static
+     * @async
+     * @param {number} memberId - The unique ID of the member.
+     * @returns {Promise<BookingModel[]>} A promise resolving
+     * to an array of the member's active bookings.
+     */
     static async getByMemberId(memberId){
 
         // Run the SQL query and store the returned rows.
@@ -72,7 +137,19 @@ export class BookingModel extends DatabaseModel {
         return rows.map((row) => this.tableToModel(row));
     }
 
-    // Find an active booking for a specific member and session
+    /**
+     * Finds an active booking for a specific member and session.
+     *
+     * Searches the bookings table for a matching member ID
+     * and session ID where the booking status is 'booked'.
+     *
+     * @static
+     * @async
+     * @param {number} memberId - The unique ID of the member.
+     * @param {number} sessionId - The unique ID of the session.
+     * @returns {Promise<BookingModel|null>} The matching
+     * active booking or null if not found.
+     */
     static async find(memberId, sessionId) {
 
         // Search for an active booking that matches the member and session
@@ -89,7 +166,19 @@ export class BookingModel extends DatabaseModel {
         return rows.length ? this.tableToModel(rows[0]) : null;
     }
 
-    // Find any booking for a specific member and session, including cancelled bookings
+    /**
+     * Finds an existing booking for a member and session.
+     *
+     * Searches for a booking regardless of whether
+     * its status is booked or cancelled.
+     *
+     * @static
+     * @async
+     * @param {number} memberId - The unique ID of the member.
+     * @param {number} sessionId - The unique ID of the session.
+     * @returns {Promise<BookingModel|null>} The matching
+     * booking or null if not found.
+     */
     static async findAny(memberId, sessionId) {
 
         // Search for a booking that matches the member and session
@@ -106,7 +195,17 @@ export class BookingModel extends DatabaseModel {
         return rows.length ? this.tableToModel(rows[0]) : null;
     }
 
-    // Change a cancelled booking back to booked
+    /**
+     * Reactivates a cancelled booking by changing its status to 'booked'.
+     *
+     * Uses an UPDATE query to change the booking status
+     * for the booking with the specified ID.
+     *
+     * @static
+     * @async
+     * @param {number} id - The unique ID of the booking to reactivate.
+     * @returns {Promise<Object>} A promise resolving to the database UPDATE result.
+     */
     static async reactivate(id) {
         return this.query(
             `
@@ -117,7 +216,17 @@ export class BookingModel extends DatabaseModel {
             [id],
         );
     }
-    // Create a new booking for a user and selected session
+    /**
+     * Creates a new gym booking in the MySQL database.
+     *
+     * Uses an INSERT query to save the member ID
+     * and session ID with a status of 'booked'.
+     *
+     * @static
+     * @async
+     * @param {BookingModel} booking - The booking details to insert.
+     * @returns {Promise<Object>} A promise resolving to the database INSERT result.
+     */
     static async create(booking) {
         return this.query(
             `
@@ -129,7 +238,17 @@ export class BookingModel extends DatabaseModel {
         );
     }
 
-    // Update an existing booking
+/**
+ * Updates an existing booking in the database.
+ *
+ * Uses an UPDATE query to change the member ID
+ * and session ID of a booking using its unique ID.
+ *
+ * @static
+ * @async
+ * @param {BookingModel} booking - The updated booking details.
+ * @returns {Promise<Object>} A promise resolving to the database UPDATE result.
+ */
 static async update(booking) {
     return this.query(
         `
@@ -146,7 +265,17 @@ static async update(booking) {
     );
 }
 
-    // Permanently delete all bookings belonging to a member
+/**
+ * Permanently deletes all bookings belonging to a member.
+ *
+ * Uses a DELETE query to remove bookings
+ * associated with the specified member ID.
+ *
+ * @static
+ * @async
+ * @param {number} memberId - The unique ID of the member.
+ * @returns {Promise<Object>} A promise resolving to the database DELETE result.
+ */
 static async deleteByMemberId(memberId) {
     return this.query(
         `
@@ -158,7 +287,17 @@ static async deleteByMemberId(memberId) {
     );
 }
 
-// Permanently delete bookings for sessions run by a trainer
+/**
+ * Deletes bookings associated with a specific trainer.
+ *
+ * Finds sessions assigned to the trainer and removes
+ * bookings that reference those sessions.
+ *
+ * @static
+ * @async
+ * @param {number} trainerId - The unique ID of the trainer.
+ * @returns {Promise<Object>} A promise resolving to the database DELETE result.
+ */
 static async deleteByTrainerId(trainerId) {
     return this.query(
         `
@@ -174,7 +313,17 @@ static async deleteByTrainerId(trainerId) {
     );
 }
 
-    // Delete all bookings associated with a specific session
+    /**
+     * Permanently deletes bookings associated with a gym session.
+     *
+     * Uses a DELETE query to remove all bookings
+     * referencing the specified session ID.
+     *
+     * @static
+     * @async
+     * @param {number} sessionId - The unique ID of the gym session.
+     * @returns {Promise<Object>} A promise resolving to the database DELETE result.
+     */
     static async deleteBySessionId(sessionId) {
         return this.query(
             `
@@ -184,7 +333,17 @@ static async deleteByTrainerId(trainerId) {
             [sessionId],
         );
     }
-
+    /**
+     * Permanently deletes a booking using its unique ID.
+     *
+     * Uses a parameterised DELETE query to remove
+     * the matching booking from the database.
+     *
+     * @static
+     * @async
+     * @param {number} id - The unique ID of the booking to delete.
+     * @returns {Promise<Object>} A promise resolving to the database DELETE result.
+     */
     static async delete(id){
         return this.query(
             `
