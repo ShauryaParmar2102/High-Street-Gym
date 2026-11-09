@@ -10,8 +10,25 @@ import { BookingActivityModel } from "../models/BookingActivityModel.mjs";
 import { UserModel } from "../models/UserModel.mjs";
 import session from "express-session";
 
-// SessionController handles public, member, trainer and administrator session features
-// Foreign key relationship: A booking references a session, and a session references a location.
+
+/**
+ * Manages gym sessions and timetables in the High Street Gym system.
+ *
+ * Provides public timetable viewing and separate session
+ * management features for members, trainers and administrators.
+ *
+ * Allows administrators to create, update and delete sessions.
+ * Allows trainers to manage their own sessions and export
+ * scheduled sessions as XML files.
+ *
+ * Allows members to view available sessions and make bookings.
+ *
+ * Uses session, booking, activity, location and user models
+ * to retrieve and manage information in the MySQL database.
+ *
+ * Applies role-based authorisation to protected routes
+ * and ownership checks when trainers manage sessions.
+ */
 export class SessionController{
     static routes = express.Router();     // Express router used to define all /session routes
 
@@ -91,7 +108,27 @@ export class SessionController{
 
     // ==================== PUBLIC TIMETABLE ====================
     
-    //Public timetable view - Displays sessions grouped by weekday and blog posts by weekday
+    /**
+     * Retrieves and displays the public gym session timetable.
+     *
+     * Loads available sessions with their related activity,
+     * location and trainer information from the database.
+     *
+     * Groups sessions by weekday using Brisbane local time
+     * and formats their dates for display in the EJS template.
+     *
+     * Identifies expired sessions and checks whether
+     * the currently logged-in user has booked each session.
+     *
+     * Renders the public timetable or an HTTP 500 error page
+     * if session retrieval fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the optional authenticated user.
+     * @param {Object} res - The Express response object used to render the timetable.
+     * @returns {Promise<void>} A promise completing after the timetable or error response is sent.
+     */
     static async viewPublicTimetable(req, res) {
         try {
             const user = req.user || null; // Get the logged-in user, or null if the visitor is a guest
@@ -183,7 +220,30 @@ export class SessionController{
        }
     }
 
-        // Display the administrator session management page
+    /**
+     * Retrieves and displays the administrator session management page.
+     *
+     * Loads all gym sessions with their related activity,
+     * location and trainer information from the database.
+     *
+     * Supports global searching and individual filters for
+     * trainer, activity, location, date, time and capacity.
+     *
+     * Formats session dates for display and retrieves
+     * a selected session when the administrator is editing.
+     *
+     * Retrieves available locations, activities and trainer
+     * accounts for the session management form.
+     *
+     * Renders the administrator session management EJS page
+     * or an HTTP 500 error response if loading fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing search, filter and optional edit parameters.
+     * @param {Object} res - The Express response object used to render the management page.
+     * @returns {Promise<void>} A promise completing after the management page or error response is sent.
+     */
     static async viewSessionManagement(req,res){
         try{
                 // Get the ID of the session selected for editing
@@ -353,16 +413,45 @@ export class SessionController{
     }
 
     // ==================== ADMIN SESSION MANAGEMENT ====================
-        // Handle administrator create, update and delete actions
+    
+    /**
+     * Handles administrator session creation, updating and deletion.
+     *
+     * Retrieves the selected session ID and submitted
+     * session information from the request.
+     *
+     * Validates session dates, start and end times,
+     * and capacity when creating or updating sessions.
+     *
+     * Checks for duplicate sessions before creating
+     * a new session in the MySQL database.
+     *
+     * Updates existing sessions using their selected IDs.
+     *
+     * Deletes associated bookings before deleting a session
+     * to handle database foreign key relationships.
+     *
+     * Redirects administrators to the session management page
+     * after successful operations.
+     *
+     * Displays validation or database error responses
+     * when session management operations fail.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the action, session ID and submitted session details.
+     * @param {Object} res - The Express response object used for redirects and error pages.
+     * @returns {Promise<void>} A promise completing after the session management response is sent.
+     */
     static async handleSessionManagement(req,res) {
         const selectedSessionId = req.params.id;
         const {
-    sessionDate,
-    startTime,
-    endTime,
-    capacity,
-    action
-} = req.body;
+        sessionDate,
+        startTime,
+        endTime,
+        capacity,
+        action
+    } = req.body;
 
         try{
                   // Run validation when trainer is creating or updating a session
@@ -460,7 +549,33 @@ if (action === "delete") {
         }
     }
 
-          // Display sessions belonging to the logged-in trainer
+    /**
+     * Retrieves and displays sessions belonging to the logged-in trainer.
+     *
+     * Uses SessionActivityModel to retrieve the trainer's
+     * scheduled sessions and their related information.
+     *
+     * Supports filtering by activity, location, trainer,
+     * session date, start time, end time and capacity.
+     *
+     * Formats session dates using Brisbane local time
+     * and prepares the session information for the EJS view.
+     *
+     * Retrieves a selected session when the trainer
+     * requests to edit an existing session.
+     *
+     * Loads available locations and activities for
+     * the trainer session management form.
+     *
+     * Renders the trainer sessions page or an HTTP 500
+     * error response if session retrieval fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated trainer and optional filters.
+     * @param {Object} res - The Express response object used to render the trainer sessions page.
+     * @returns {Promise<void>} A promise completing after the trainer sessions page or error response is sent.
+     */
       static async viewTrainerSession(req, res) {
         try {
             const user = req.user; // Get logged-in trainer
@@ -601,7 +716,35 @@ if (action === "delete") {
         }
       }
 
-     // Get the logged-in trainer's sessions, filter them by the selected week, and generate a downloadable XML file
+/**
+ * Exports the logged-in trainer's sessions as an XML file.
+ *
+ * Retrieves the authenticated trainer and the selected
+ * start and end dates from the request query.
+ *
+ * Validates that both dates have been provided.
+ *
+ * Uses SessionActivityModel to retrieve sessions
+ * belonging to the logged-in trainer.
+ *
+ * Filters the sessions to include only those
+ * within the selected date range.
+ *
+ * Sets the response content type to XML and
+ * configures the file as a browser download.
+ *
+ * Renders the trainer sessions XML EJS template
+ * with the filtered session and trainer information.
+ *
+ * Returns HTTP 400 for missing dates or HTTP 500
+ * if the export operation fails.
+ *
+ * @static
+ * @async
+ * @param {Object} req - The Express request object containing the trainer and selected date range.
+ * @param {Object} res - The Express response object used to generate the XML download.
+ * @returns {Promise<void>} A promise completing after the XML file or error response is sent.
+ */
 static async exportTrainerSessionsXml(req, res) {
     try {
         const trainer = req.user; // Get the currently logged-in trainer
@@ -660,7 +803,40 @@ static async exportTrainerSessionsXml(req, res) {
 }
 
     // ==================== TRAINER SESSION MANAGEMENT ====================
-          // Handle trainer session creation and deletion
+      
+    /**
+     * Handles trainer session creation, updating and deletion.
+     *
+     * Retrieves the logged-in trainer's ID and submitted
+     * session information from the request body.
+     *
+     * Validates session dates and capacity when creating
+     * or updating sessions.
+     *
+     * Checks for duplicate sessions before allowing
+     * the trainer to create a new session.
+     *
+     * Verifies session ownership before allowing trainers
+     * to update or delete their existing sessions.
+     *
+     * Uses SessionModel to create, update and delete
+     * session records in the MySQL database.
+     *
+     * Deletes associated bookings before removing
+     * a session from the database.
+     *
+     * Redirects the trainer to their sessions page
+     * after a successful operation.
+     *
+     * Returns validation, authorisation or database
+     * error responses when operations fail.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated trainer, action and session details.
+     * @param {Object} res - The Express response object used for redirects and error responses.
+     * @returns {Promise<void>} A promise completing after the trainer session management response is sent.
+     */
       static async handleTrainerSessions(req, res) {
 
         const trainerId = req.user.id; // Get the logged-in trainer's ID
@@ -794,7 +970,33 @@ static async exportTrainerSessionsXml(req, res) {
               }
             }
 
-                // Display available sessions to a member and show their booking status
+            /**
+             * Retrieves and displays available gym sessions for members.
+             *
+             * Retrieves all sessions with their related activity,
+             * location and trainer information from the database.
+             *
+             * Loads bookings belonging to the logged-in member
+             * to identify sessions they have already booked.
+             *
+             * Groups available sessions by weekday using
+             * Brisbane local time and formats their dates.
+             *
+             * Sorts the sessions within each weekday group
+             * and prepares the information for the EJS template.
+             *
+             * Renders the member sessions page with the
+             * session timetable and existing booking information.
+             *
+             * Returns HTTP 500 if the session information
+             * cannot be retrieved from the database.
+             *
+             * @static
+             * @async
+             * @param {Object} req - The Express request object containing the authenticated member.
+             * @param {Object} res - The Express response object used to render the member sessions page.
+             * @returns {Promise<void>} A promise completing after the member sessions page or error response is sent.
+             */
             static async viewMemberSession(req, res) {
                 try {
                     const user = req.user;  // Get the currently logged-in member
@@ -881,7 +1083,35 @@ static async exportTrainerSessionsXml(req, res) {
                 });
             }  
          }
-        // Handle a member selecting a session to book
+        
+        /**
+         * Handles a member's request to book a gym session.
+         *
+         * Retrieves the authenticated member's ID
+         * and the selected session ID from the URL.
+         *
+         * Uses SessionModel to retrieve the selected
+         * session and verify that it exists.
+         *
+         * Checks the session date to prevent members
+         * from booking sessions on previous dates.
+         *
+         * Uses BookingModel to create a booking containing
+         * the session ID, member details and booking date.
+         *
+         * Redirects members to their bookings page
+         * after successfully creating a booking.
+         *
+         * Returns HTTP 404 if the session does not exist,
+         * HTTP 422 for past session dates or HTTP 500
+         * if the booking operation fails.
+         *
+         * @static
+         * @async
+         * @param {Object} req - The Express request object containing the authenticated member and selected session ID.
+         * @param {Object} res - The Express response object used for redirects and error pages.
+         * @returns {Promise<void>} A promise completing after the booking or error response is sent.
+         */
          static async handleMemberSession(req, res) {
             try {
                 const userId = req.user.id; //Get logged in member

@@ -7,6 +7,24 @@ import { ActivityModel } from "../models/ActivityModel.mjs";
 import { UserModel } from "../models/UserModel.mjs";
 import session from "express-session";
 
+/**
+ * Handles member and administrator booking management
+ * in the High Street Gym web application.
+ *
+ * Provides routes for viewing, creating, updating
+ * and deleting gym session bookings.
+ *
+ * Allows members to view their bookings, confirm
+ * sessions and export booking information as XML.
+ *
+ * Allows administrators to manage bookings
+ * using the booking management EJS interface.
+ *
+ * Uses BookingModel and related models to retrieve
+ * booking, session, activity, location and user data.
+ *
+ * Applies role-based authorisation to protect routes.
+ */
 export class BookingController {
     static routes = express.Router();  // Create an Express router for all booking-related routes
 
@@ -66,11 +84,30 @@ export class BookingController {
         );
     }
 
-        // ============================================================
-        // MEMBER BOOKING VIEWS
-        // ============================================================
+    // ============================================================
+    // MEMBER BOOKING VIEWS
+    // ============================================================
 
-        // Display all bookings belonging to the currently logged-in member
+    /**
+     * Retrieves and displays bookings for the logged-in member.
+     *
+     * Uses BookingModel to retrieve the member's bookings
+     * and SessionActivityModel to load session details.
+     *
+     * Combines each booking with its related session
+     * information for display in the EJS template.
+     *
+     * Optionally retrieves a selected booking for editing.
+     *
+     * Renders the member bookings page on success
+     * or HTTP 500 if the bookings cannot be loaded.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated member and optional edit ID.
+     * @param {Object} res - The Express response object used to render the bookings page.
+     * @returns {Promise<Object>} A promise resolving to the rendered page or error response.
+     */
     static async viewMemberBooking(req, res) {
         try {
             const user = req.user; // Get the currently logged-in member
@@ -115,7 +152,27 @@ export class BookingController {
         }
     }
 
-    // Export the logged-in member's previous bookings as XML
+/**
+ * Exports the authenticated member's booking history as XML.
+ *
+ * Retrieves bookings belonging to the logged-in member
+ * and loads their related gym session information.
+ *
+ * Combines booking and session details before rendering
+ * the member bookings XML EJS template.
+ *
+ * Sets the response content type to XML
+ * and provides a downloadable XML filename.
+ *
+ * Returns the generated XML document on success
+ * or HTTP 500 if the export fails.
+ *
+ * @static
+ * @async
+ * @param {Object} req - The Express request object containing the authenticated member.
+ * @param {Object} res - The Express response object used to return the XML document.
+ * @returns {Promise<Object>} A promise resolving to the XML response or error page.
+ */
 static async exportMemberBookingsXml(req, res) {
     try {
 
@@ -168,9 +225,27 @@ static async exportMemberBookingsXml(req, res) {
         });
     }
 }
-
-    
-        // Display the booking confirmation page
+ 
+    /**
+     * Displays the booking confirmation page for a selected session.
+     *
+     * Retrieves the session ID from the request parameters
+     * and loads available gym sessions from the database.
+     *
+     * Finds the selected session and displays
+     * its details alongside the authenticated member.
+     *
+     * Renders the booking confirmation EJS template.
+     *
+     * Returns HTTP 404 if the session cannot be found
+     * or HTTP 500 if an unexpected error occurs.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the selected session ID and authenticated member.
+     * @param {Object} res - The Express response object used to render the confirmation page.
+     * @returns {Promise<Object>} A promise resolving to the confirmation page or error response.
+     */
     static async viewMemberBookingConfirm(req, res) {
         try {
             const user = req.user; // Get the currently logged-in member
@@ -207,7 +282,27 @@ static async exportMemberBookingsXml(req, res) {
             });
         }
     }
-        // Handles confirming a session booking
+    
+    /**
+     * Processes confirmation of a member's gym session booking.
+     *
+     * Retrieves the authenticated member and selected session ID.
+     *
+     * Checks whether the member has already booked
+     * the session using BookingModel.
+     *
+     * Creates a booking if no matching booking exists
+     * to prevent duplicate bookings.
+     *
+     * Redirects the member to the sessions page on success
+     * or displays HTTP 500 if booking confirmation fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the member and session ID.
+     * @param {Object} res - The Express response object used for redirects and error pages.
+     * @returns {Promise<Object>} A promise resolving to the booking confirmation response.
+     */
     static async handleConfirmBooking(req, res) {
         try {
             const user = req.user; // Get the currently logged-in member
@@ -239,7 +334,30 @@ static async exportMemberBookingsXml(req, res) {
             });
         }
     }
-
+    
+    /**
+     * Handles member booking creation, updates and deletion.
+     *
+     * Retrieves the booking action and session details
+     * from the submitted form.
+     *
+     * Deletes a booking when the delete action is selected
+     * or updates an existing booking when requested.
+     *
+     * Checks for previous bookings to prevent duplicates
+     * and reactivates bookings that were previously cancelled.
+     *
+     * Creates a new booking when no existing record is found.
+     *
+     * Redirects to the member bookings page on success
+     * or returns HTTP 500 if an error occurs.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated member and booking form data.
+     * @param {Object} res - The Express response object used for redirects and error pages.
+     * @returns {Promise<Object>} A promise resolving to the booking management response.
+     */
     static async handleMemberBooking(req, res) {
         try {
             const user = req.user; // Get the currently logged-in member
@@ -304,10 +422,32 @@ static async exportMemberBookingsXml(req, res) {
         }
     }
 
-    // ============================================================
+    
     // ADMIN BOOKING MANAGEMENT VIEWS
-    // ============================================================
 
+    /**
+     * Retrieves and displays bookings for administrators.
+     *
+     * Loads booking, session, user, location
+     * and activity information from the database.
+     *
+     * Combines bookings with their related members
+     * and sessions, then sorts them by session date.
+     *
+     * Supports searching by member, trainer, activity,
+     * location and session start time.
+     *
+     * Optionally retrieves a selected booking for editing.
+     *
+     * Renders the administrator booking management EJS page
+     * or HTTP 500 if the information cannot be loaded.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing search and edit query parameters.
+     * @param {Object} res - The Express response object used to render the management page.
+     * @returns {Promise<Object>} A promise resolving to the rendered page or error response.
+     */
     static async viewAdminBooking(req, res) {
         try {
         // Get all bookings from the database
@@ -429,7 +569,31 @@ static async exportMemberBookingsXml(req, res) {
         }
     }
 
-    //Admin booking CRUD handler
+    /**
+     * Handles administrator booking management operations.
+     *
+     * Retrieves the booking ID, session ID, member ID
+     * and requested action from the submitted form.
+     *
+     * Allows administrators to create, update
+     * and delete bookings using BookingModel.
+     *
+     * Validates required member and session information
+     * before creating or updating a booking.
+     *
+     * Checks whether a booking already exists
+     * to prevent duplicate booking records.
+     *
+     * Redirects to the booking management page on success.
+     * Returns HTTP 409 for duplicate bookings
+     * or HTTP 500 if a database operation fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the administrator's booking form data.
+     * @param {Object} res - The Express response object used for redirects and error pages.
+     * @returns {Promise<Object>} A promise resolving to the booking management response.
+     */
     static async handleBookingManagement(req,res) {
         try {
             let { id, sessionId, userId, action} = req.body;

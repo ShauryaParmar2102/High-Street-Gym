@@ -3,6 +3,18 @@ import { ApiAuthenticationController } from "./ApiAuthenticationController.mjs";
 import bcrypt from "bcryptjs";
 import { UserModel } from "../../models/UserModel.mjs";
 
+/**
+ * Handles user API requests in the High Street Gym system.
+ *
+ * Provides endpoints for registering new members,
+ * retrieving user information and updating user accounts.
+ *
+ * Uses UserModel to interact with the MySQL database
+ * and bcrypt to securely hash user passwords.
+ *
+ * Applies authentication and authorisation middleware
+ * to protect user information and account updates.
+ */
 export class ApiUserController {
     static routes = express.Router(); // Create an Express router for all user API routes
 
@@ -34,9 +46,28 @@ export class ApiUserController {
         );
     }
     // ========== POST - MEMBER REGISTRATION ==========
-    // Creates a new member account.
-    // Hashes the password using bcrypt before saving to MySQL.
-    // Returns HTTP 201 when the account is successfully created.
+    /**
+     * Creates a new member account in the High Street Gym system.
+     *
+     * Retrieves registration details from the request body
+     * and checks that an email and password are provided.
+     *
+     * Uses bcrypt to hash the password before saving
+     * the new user account to the MySQL database.
+     *
+     * Assigns the new account the member role.
+     *
+     * Returns HTTP 201 on successful registration,
+     * HTTP 400 for missing required fields
+     * or HTTP 500 if account creation fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing member registration details.
+     * @param {Object} res - The Express response object used to return registration results.
+     * @returns {Promise<Object>} A promise resolving to the HTTP response
+     * indicating whether the member account was created.
+     */
     static async createNewMember(req, res) {
         try {
             if(!req.body.email || !req.body.password) {
@@ -76,10 +107,25 @@ export class ApiUserController {
             });
         }
     }
-    // ========== GET - AUTHENTICATED USER ==========
-    // Retrieves the currently logged-in user's details.
-    // Returns their ID, name, email, role and account creation date.
-    // Demonstrates the GET /users/self endpoint.
+// ========== GET - AUTHENTICATED USER ==========
+    /**
+     * Retrieves the currently authenticated user's information.
+     *
+     * Gets the logged-in user from the request object
+     * and returns their account details as JSON.
+     *
+     * Includes the user's ID, first name, last name,
+     * email address, assigned role and creation date.
+     *
+     * Returns HTTP 200 with the authenticated user's details.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated user.
+     * @param {Object} res - The Express response object used to return user information.
+     * @returns {Promise<Object>} A promise resolving to the HTTP response
+     * containing the authenticated user's account details.
+     */
     static async getAuthenticatedUser(req,res) {
         const user = req.authenticatedUser;
 
@@ -93,9 +139,29 @@ export class ApiUserController {
         });
     }
     // ==========  GET - USER BY ID ==========
-    // Retrieves a specific user's information from MySQL.
-    // Only allows the user themselves or an administrator to view it.
-    // Returns HTTP 403 for forbidden access and 404 if the user is not found.
+    /**
+     * Retrieves a specific user from the database using their ID.
+     *
+     * Converts the user ID from the request parameters
+     * into a number and validates the supplied ID.
+     *
+     * Checks that the authenticated user is either
+     * requesting their own information or is an administrator.
+     *
+     * Uses UserModel to retrieve the matching user
+     * and returns their account information as JSON.
+     *
+     * Returns HTTP 200 on success, HTTP 400 for an invalid ID,
+     * HTTP 403 for forbidden access, HTTP 404 if the user
+     * does not exist or HTTP 500 if an error occurs.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the user ID and authenticated user.
+     * @param {Object} res - The Express response object used to return user details.
+     * @returns {Promise<Object>} A promise resolving to the HTTP response
+     * containing the requested user or an error message.
+     */
     static async getUserbyId(req,res){
         try{
             //Convert URL parameter to a number
@@ -147,11 +213,33 @@ export class ApiUserController {
             });
         }
     }
-// ========== PATCH - UPDATE USER INFORMATION ==========
-// Allows authenticated users to update their own personal details.
-// Updates only supplied fields while preserving existing information.
-// Hashes a new password if provided.
-// Returns HTTP 200 when the update succeeds.
+    // ========== PATCH - UPDATE USER INFORMATION ==========
+
+    /**
+     * Updates the authenticated user's personal information.
+     *
+     * Retrieves the target user ID from the request parameters
+     * and verifies that the user is updating their own account.
+     *
+     * Loads the existing user information from MySQL
+     * and updates only the fields supplied in the request body.
+     *
+     * Preserves existing account details when fields are omitted.
+     * Uses bcrypt to hash a new password when one is provided.
+     *
+     * Saves the updated user information using UserModel.
+     *
+     * Returns HTTP 200 on success, HTTP 403 for forbidden access,
+     * HTTP 404 if the user is not found
+     * or HTTP 500 if the update fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the user ID, authenticated user and updated details.
+     * @param {Object} res - The Express response object used to send update results.
+     * @returns {Promise<Object>} A promise resolving to the HTTP response
+     * indicating whether the user information was updated.
+     */
     static async UserPersonalInformation(req, res) {
         try {
             const user = req.authenticatedUser;

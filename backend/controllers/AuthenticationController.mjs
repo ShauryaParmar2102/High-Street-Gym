@@ -4,6 +4,19 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { UserModel } from "../models/UserModel.mjs";
 
+/**
+ * Handles user authentication and authorisation
+ * for the High Street Gym web application.
+ *
+ * Provides routes for user login, registration,
+ * logout and displaying the dashboard.
+ *
+ * Uses Express sessions to maintain logged-in users
+ * and bcrypt to securely hash and verify passwords.
+ *
+ * Also provides middleware to authenticate users
+ * and restrict access based on their assigned roles.
+ */
 export class AuthenticationController {
     static middleware = express.Router();
     static routes = express.Router();
@@ -55,7 +68,24 @@ export class AuthenticationController {
          this.viewDashboard,
         );
     }
-           // API SECURITY: Load the authenticated user from the session
+            /**
+             * Authenticates users using their existing Express session.
+             *
+             * Checks whether the session contains a user ID
+             * and retrieves the matching user from MySQL.
+             *
+             * Stores the authenticated user in the request object
+             * or sets the user to null if authentication fails.
+             *
+             * Continues to the next middleware or route.
+             *
+             * @static
+             * @async
+             * @param {Object} req - The Express request object containing session information.
+             * @param {Object} res - The Express response object.
+             * @param {Function} next - The callback used to continue to the next middleware.
+             * @returns {Promise<void>} A promise that resolves when authentication processing finishes.
+             */
             static async sessionAuth(req, res, next) {
              try {
             // API SECURITY: Check whether the session contains a logged-in user's ID
@@ -77,7 +107,17 @@ export class AuthenticationController {
         next();  // Continue to the next middleware or route
         }
 
-        // Display the login page
+        /**
+         * Displays the user login page.
+         *
+         * Renders the login EJS template and passes
+         * registration and logout messages from the URL query.
+         *
+         * @static
+         * @param {Object} req - The Express request object containing query parameters.
+         * @param {Object} res - The Express response object used to render the login page.
+         * @returns {Object} The Express response rendering the login page.
+         */
         static viewAuthenticate(req, res) {
             // Render the login EJS and send query messages to the view
             return res.render("login.ejs", {
@@ -88,13 +128,36 @@ export class AuthenticationController {
             });
         }
 
-        // Display the registration page
+        /**
+         * Displays the member registration page.
+         *
+         * Renders the registration EJS template
+         * so new members can create an account.
+         *
+         * @static
+         * @param {Object} req - The Express request object.
+         * @param {Object} res - The Express response object used to render the registration page.
+         * @returns {Object} The Express response rendering the registration page.
+         */
         static viewRegister(req, res) {
              // Render the registration EJS page
             return res.render("register.ejs");
         }
 
-         // Display the dashboard for the logged-in user
+        /**
+         * Displays the dashboard for the authenticated user.
+         *
+         * Checks whether a user is logged in and redirects
+         * unauthenticated users to the login page.
+         *
+         * Renders the dashboard EJS template and passes
+         * the authenticated user's information to the view.
+         *
+         * @static
+         * @param {Object} req - The Express request object containing the authenticated user.
+         * @param {Object} res - The Express response object used to render or redirect.
+         * @returns {Object} The Express response containing the dashboard or redirect.
+         */
         static viewDashboard(req, res){
 
             //If there is no autenticated user, send them to the login page
@@ -106,7 +169,27 @@ export class AuthenticationController {
                 user: req.user,
             });
         }
-            // REGISTER VALIDATION - Check name, email and password requirements
+        /**
+         * Processes member registration form submissions.
+         *
+         * Validates the user's first name, last name,
+         * email address and password.
+         *
+         * Checks whether the email is already registered
+         * and uses bcrypt to hash the password.
+         *
+         * Creates a new member account in MySQL
+         * and generates a unique authentication key.
+         *
+         * Redirects to the login page on successful registration.
+         * Displays validation or server errors when registration fails.
+         *
+         * @static
+         * @async
+         * @param {Object} req - The Express request object containing registration form data.
+         * @param {Object} res - The Express response object used for redirects and error pages.
+         * @returns {Promise<Object>} A promise resolving to the registration response.
+         */
         static async handleRegister(req, res) {
             try {
                 // Get the registration form values from the request body
@@ -182,8 +265,29 @@ export class AuthenticationController {
                 });
             }
         }
-            // ==================== USER LOGIN ====================
-            // Handles user login by checking the email and password
+        
+        /**
+         * Processes user login requests.
+         *
+         * Retrieves the email and password from the login form
+         * and checks that both fields have been provided.
+         *
+         * Finds the matching user in MySQL and uses bcrypt
+         * to compare the password with the stored hash.
+         *
+         * Stores the authenticated user's ID in the session
+         * and redirects to the dashboard after successful login.
+         *
+         * Displays an error page for invalid credentials,
+         * session errors or database failures.
+         *
+         * @static
+         * @async
+         * @param {Object} req - The Express request object containing login credentials.
+         * @param {Object} res - The Express response object used for redirects and error pages.
+         * @returns {Promise<Object|undefined>} A promise resolving to the login response
+         * or undefined when the session-save callback handles the response.
+         */
         static async handleAuthenticate(req, res) {
             const {email, password} = req.body; // Get the email and password entered by the user in the login form
 
@@ -262,7 +366,22 @@ export class AuthenticationController {
                 });
             }
         }
-            // Log the current user out of the application
+        
+        /**
+         * Logs the currently authenticated user out of the application.
+         *
+         * Checks whether a user session exists and destroys
+         * the session to remove the user's login information.
+         *
+         * Redirects to the login page after successful logout.
+         * Displays an error page if the session cannot be destroyed.
+         *
+         * @static
+         * @param {Object} req - The Express request object containing session information.
+         * @param {Object} res - The Express response object used for redirects and error pages.
+         * @returns {Object|undefined} The redirect response when no session exists,
+         * or undefined when the session-destroy callback handles the response.
+         */
         static handleDeauthenticate(req,res) {
 
                     // If there is no logged-in user, return to the login page
@@ -288,7 +407,24 @@ export class AuthenticationController {
 
     // ==================== ROLE-BASED ACCESS CONTROL ====================
 
-            // Restrict a route so only specified user roles can access it
+        /**
+         * Restricts access to routes based on authenticated user roles.
+         *
+         * Returns middleware that checks whether a user
+         * is logged in and has one of the permitted roles.
+         *
+         * Converts role names to lowercase for comparison.
+         *
+         * Returns HTTP 401 if the user is not authenticated
+         * and HTTP 403 if the user's role is not authorised.
+         *
+         * Allows the request to continue when access is permitted.
+         *
+         * @static
+         * @param {string[]} roles - An array of user roles allowed to access the route.
+         * @returns {Function} An Express middleware function
+         * that checks authentication and role permissions.
+         */
         static restrict(roles) {
                 // Return middleware that runs before the protected route
             return(req, res, next) => {
@@ -309,7 +445,6 @@ export class AuthenticationController {
       }
 
       const userRole = user.role.toLowerCase();// Convert the user's role to lowercase for consistent comparison
-
 
         // Convert all allowed roles to lowercase
       const allowedRoles = roles.map((role) => role.toLowerCase()); 

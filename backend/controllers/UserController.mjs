@@ -7,6 +7,27 @@ import { PostModel } from "../models/PostModel.mjs";
 import { SessionModel } from "../models/SessionModel.mjs";
 import { AuthenticationController } from "./AuthenticationController.mjs";
 
+/**
+ * Handles user account management in the High Street Gym system.
+ *
+ * Provides routes for viewing, creating, updating
+ * and deleting user accounts.
+ *
+ * Allows administrators and trainers to view users,
+ * search by name or email and filter by user role.
+ *
+ * Restricts user creation, updating and deletion
+ * to administrators through role-based authorisation.
+ *
+ * Validates user information and hashes passwords
+ * using bcrypt before storing them in MySQL.
+ *
+ * Uses UserModel, BookingModel, SessionModel and PostModel
+ * to manage user accounts and their related database records.
+ *
+ * Removes associated bookings, sessions and posts
+ * when necessary to maintain database relationships.
+ */
 export class UserController {
     static routes = express.Router();
 
@@ -40,7 +61,35 @@ export class UserController {
         );
     }
 
-    //View user management
+    /**
+     * Retrieves and displays the user management page.
+     *
+     * Uses UserModel to retrieve all user accounts
+     * from the MySQL database.
+     *
+     * Supports optional searching by the user's
+     * first name, last name or email address.
+     *
+     * Allows users to be filtered by their assigned role.
+     *
+     * Retrieves the selected user using the ID
+     * provided in the URL parameters.
+     *
+     * Creates an empty UserModel object when no
+     * matching user is selected.
+     *
+     * Renders the user management EJS template
+     * with the users, selected user and search filters.
+     *
+     * Returns HTTP 500 if user information
+     * cannot be retrieved from the database.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated user, search filters and optional user ID.
+     * @param {Object} res - The Express response object used to render the user management page.
+     * @returns {Promise<Object>} A promise resolving to the rendered user management page or error response.
+     */
     static async viewUserManagement(req, res) {
         const selectedUserId = req.params.id;
         const search = req.query.search || "";
@@ -87,7 +136,47 @@ export class UserController {
     }
 
     // ==================== USER CREATION VALIDATION ====================
-    // Validate the user's name, email and password before creating the account
+    
+    /**
+     * Handles administrator user creation, updating and deletion.
+     *
+     * Retrieves the requested action, selected user ID
+     * and submitted user information from the request.
+     *
+     * Validates first names, last names, email addresses
+     * and password length when creating user accounts.
+     *
+     * Uses bcrypt to securely hash passwords before
+     * storing them in the MySQL database.
+     *
+     * Generates a unique authentication key using crypto
+     * when creating a new user account.
+     *
+     * Allows administrators to update user information
+     * and optionally change the user's password.
+     *
+     * Removes associated trainer bookings and sessions
+     * when a trainer is assigned a different role.
+     *
+     * Deletes related bookings, sessions and posts
+     * before deleting an existing user account.
+     *
+     * Uses UserModel and related database models
+     * to perform user management operations.
+     *
+     * Redirects to the user management page
+     * after successful creation, updating or deletion.
+     *
+     * Returns HTTP 400 for invalid requests or
+     * database relationship errors and HTTP 500
+     * if an unexpected database operation fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the administrator, selected user ID and submitted form data.
+     * @param {Object} res - The Express response object used for redirects and error pages.
+     * @returns {Promise<Object>} A promise resolving to the user management response.
+     */
     static async handleUserManagement(req, res) {
         const selectedUserId = req.params.id;
         const formData = req.body;

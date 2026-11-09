@@ -2,6 +2,21 @@ import express from "express";
 import { PostModel } from "../models/PostModel.mjs";
 import { AuthenticationController } from "./AuthenticationController.mjs";
 
+/**
+ * Handles blog and microblog management in the High Street Gym system.
+ *
+ * Provides routes for viewing, creating, updating
+ * and deleting blog posts.
+ *
+ * Supports public blog viewing and separate post
+ * management interfaces for members, trainers and administrators.
+ *
+ * Validates post titles and content before saving
+ * and uses PostModel to interact with the MySQL database.
+ *
+ * Applies role-based authorisation to protected routes
+ * and ownership checks for member and trainer posts.
+ */
 export class PostController {
     static routes = express.Router(); // Creates a router for all post-related routes.
 
@@ -90,12 +105,38 @@ export class PostController {
         );
     }
 
-    // Check whether input contains HTML tags
+    /**
+     * Checks whether the supplied text contains HTML-like tags.
+     *
+     * Uses a regular expression to detect HTML-like markup
+     * in post titles and content during validation.
+     *
+     * @static
+     * @param {string} [text=""] - The text to check for HTML-like tags.
+     * @returns {boolean} True if HTML-like tags are detected,
+     * otherwise false.
+     */
     static containsDangerousHTML(text = "") {
         return /<[^>]*>/i.test(text);
     }
 
-    // Validate a post title and content
+    /**
+     * Validates and cleans a blog post's title and content.
+     *
+     * Removes leading and trailing whitespace from both fields.
+     *
+     * Checks required fields, length restrictions,
+     * uppercase title requirements and HTML-like input.
+     *
+     * Returns the cleaned values and any validation
+     * error message without saving data to the database.
+     *
+     * @static
+     * @param {string} title - The submitted blog post title.
+     * @param {string} content - The submitted blog post content.
+     * @returns {Object} An object containing cleanTitle,
+     * cleanContent and an error message or null.
+     */
     static validatePost(title, content) {
         const cleanTitle = title?.trim();
         const cleanContent = content?.trim();
@@ -129,7 +170,24 @@ export class PostController {
         };
     }
 
-    // Display all posts on the public blog
+    /**
+     * Retrieves and displays all posts on the public blog.
+     *
+     * Uses PostModel to retrieve blog posts from MySQL
+     * and renders them using the public blog EJS template.
+     *
+     * Allows visitors to view community posts without
+     * requiring a specific user role.
+     *
+     * Renders an error page with HTTP 500
+     * if the posts cannot be loaded.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object.
+     * @param {Object} res - The Express response object used to render the blog page.
+     * @returns {Promise<Object>} A promise resolving to the rendered blog page or error response.
+     */
     static async viewPublicBlog(req, res) {
         try {
             const posts = await PostModel.getAll();
@@ -147,42 +205,69 @@ export class PostController {
         }
     }
 
-    // Display all posts for administrator management
+    /**
+     * Retrieves and displays blog posts for administrators.
+     *
+     * Uses PostModel to load all posts from the database.
+     *
+     * Supports optional searching by post title or content
+     * using case-insensitive text matching.
+     *
+     * Optionally retrieves a selected post using its ID.
+     *
+     * Renders the administrator post management EJS page
+     * or HTTP 500 if the posts cannot be retrieved.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing optional search and post ID values.
+     * @param {Object} res - The Express response object used to render the management page.
+     * @returns {Promise<Object>} A promise resolving to the rendered page or error response.
+     */
     static async viewPosts(req, res) {
         try {
-            let posts = await PostModel.getAll();
-            const search = req.query.search || "";
+            let posts = await PostModel.getAll(); // Retrieve all blog posts from the MySQL database
+            const search = req.query.search || ""; // Get the search query from the URL, or use an empty string if none exists
 
+            // Only filter posts if the user has entered a search term
             if (search.trim()) {
-                const keyword = search.trim().toLowerCase();
+                const keyword = search.trim().toLowerCase(); // Remove extra spaces and convert the search term to lowercase
 
+                 // Filter posts by matching the search term against the title or content
                 posts = posts.filter(
                     (post) =>
+                        // Check whether the post title contains the search term
                         (post.title || "")
                             .toLowerCase()
                             .includes(keyword) ||
+                            // Check whether the post content contains the search term
                         (post.content || "")
                             .toLowerCase()
                             .includes(keyword),
                 );
             }
 
+            // Convert the selected post ID from the URL parameter into a number
             const selectedId = Number(req.params.id);
 
+            // If the post ID is invalid, set selectedPost to null
+            // Otherwise, retrieve the selected post from the MySQL database
             const selectedPost = Number.isNaN(selectedId)
                 ? null
                 : await PostModel.getById(selectedId);
 
+            // Render the administrator post management page with the required data
             return res.render("post_management.ejs", {
-                authenticatedUser: req.user,
-                posts,
-                selectedPost,
-                search,
-                error: null,
+                authenticatedUser: req.user, // Currently logged-in administrator
+                posts, // List of retrieved or filtered posts
+                selectedPost,  // Selected post for editing, or null
+                search,  // Current search query
+                error: null, // No error occurred while loading the page
             });
         } catch (error) {
-            console.error(error);
+            console.error(error); // Log any errors that occur while retrieving or displaying posts
 
+            // Return HTTP 500 and display an error page if loading posts fails
             return res.status(500).render("status.ejs", {
                 status: "Failed to load posts",
                 message: "An error occurred while loading the posts",
@@ -190,7 +275,28 @@ export class PostController {
         }
     }
 
-    // Display one post by ID
+    /**
+     * Retrieves and displays a specific blog post using its ID.
+     *
+     * Converts the post ID from the URL into a number
+     * and validates the supplied identifier.
+     *
+     * Uses PostModel to retrieve the selected post
+     * and loads the available blog posts.
+     *
+     * Renders the post management EJS page
+     * with the selected post information.
+     *
+     * Returns HTTP 400 for an invalid post ID,
+     * HTTP 404 if the post does not exist
+     * or HTTP 500 if an unexpected error occurs.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the requested post ID.
+     * @param {Object} res - The Express response object used to render the post page.
+     * @returns {Promise<Object>} A promise resolving to the rendered page or error response.
+     */
     static async viewPostById(req, res) {
         try {
             const id = Number(req.params.id);
@@ -229,7 +335,23 @@ export class PostController {
         }
     }
 
-    // Display posts belonging to the logged-in member
+    /**
+     * Retrieves and displays community blog posts for members.
+     *
+     * Uses PostModel to retrieve all blog posts
+     * from the MySQL database.
+     *
+     * Renders the member posts EJS page with
+     * the authenticated member and community posts.
+     *
+     * Returns HTTP 500 if the posts cannot be loaded.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated member.
+     * @param {Object} res - The Express response object used to render the member posts page.
+     * @returns {Promise<Object>} A promise resolving to the rendered page or error response.
+     */
     static async viewMemberPosts(req, res) {
         try {
            const posts = await PostModel.getAll();
@@ -250,7 +372,19 @@ export class PostController {
         }
     }
 
-    // Display the member create-post page
+    /**
+     * Displays the page for members to create new blog posts.
+     *
+     * Renders the member create-post EJS template
+     * and passes the authenticated member to the view.
+     *
+     * Initialises the error value to null.
+     *
+     * @static
+     * @param {Object} req - The Express request object containing the authenticated member.
+     * @param {Object} res - The Express response object used to render the create-post page.
+     * @returns {Object} The Express response rendering the member create-post page.
+     */
     static viewCreateMemberPostPage(req, res) {
         return res.render("member_create_post.ejs", {
             authenticatedUser: req.user,
@@ -258,7 +392,34 @@ export class PostController {
         });
     }
 
-    // Handle member create, update and delete actions
+    /**
+     * Handles creating, updating and deleting member blog posts.
+     *
+     * Retrieves the authenticated member and submitted
+     * post details from the request body.
+     *
+     * Validates post titles and content using validatePost().
+     *
+     * Allows members to create posts associated
+     * with their own user ID.
+     *
+     * Checks post ownership before allowing members
+     * to update or delete existing posts.
+     *
+     * Uses PostModel to create, update and delete
+     * post records in the MySQL database.
+     *
+     * Redirects to the member posts page on success.
+     * Returns HTTP 400 for invalid input or actions,
+     * HTTP 403 for forbidden access, HTTP 404 for missing posts,
+     * or HTTP 500 if a database operation fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated member and submitted post details.
+     * @param {Object} res - The Express response object used for redirects and error pages.
+     * @returns {Promise<Object>} A promise resolving to the member post management response.
+     */
     static async handleMemberPost(req, res) {
         try {
             const user = req.user;
@@ -297,9 +458,11 @@ export class PostController {
             // Check that the post title and content meet the validation requirements
                     PostController.validatePost(title, content); 
 
+            // Check if the submitted title or content failed validation
             if (error) {
-                const posts = await PostModel.getAll();
+                const posts = await PostModel.getAll();  // Retrieve all posts from the MySQL database
 
+                // Filter the posts to include only those created by the logged-in member
                 const memberPosts = posts.filter(
                     (post) => post.userid === user.id,
                 );
@@ -311,48 +474,65 @@ export class PostController {
                 });
             }
 
+            // ==================== MEMBER CREATE POST ====================
+
+            // Check whether the member has requested to create a new post
             if (action === "create") {
+
+                 // Create a new PostModel object using the validated post details
                 const post = new PostModel(
-                    null,
-                    user.id,
-                    cleanTitle,
-                    null,
-                    cleanContent,
+                    null, // No post ID yet because MySQL generates it
+                    user.id, // Associate the post with the logged-in member
+                    cleanTitle, // Validated post title
+                    null, // Creation date is generated by the database
+                    cleanContent, // Validated post content
                 );
 
-                await PostModel.create(post);
+                await PostModel.create(post); // Save the new member post to the MySQL database
 
-                return res.redirect("/post/member");
+                return res.redirect("/post/member"); // Redirect the member back to the posts page after creating the post
             }
 
+            // ==================== MEMBER UPDATE OWN POST ====================
+
+            // Check whether the member has requested to update an existing post
             if (action === "update") {
+
+                 // Retrieve the selected post from the database using its ID
                 const existingPost = await PostModel.getById(id);
 
+                 // Check whether the requested post exists
                 if (!existingPost) {
+
+                    // Return HTTP 404 if the post cannot be found
                     return res.status(404).render("status.ejs", {
                         status: "Post not found",
                         message: "The requested post was not found",
                     });
                 }
 
+                // Verify that the post belongs to the logged-in member
                 if (existingPost.userid !== user.id) {
+
+                    // Return HTTP 403 to prevent members from editing other users' posts
                     return res.status(403).render("status.ejs", {
                         status: "Access denied",
                         message: "You can only edit your own posts",
                     });
                 }
 
+                 // Create a PostModel object containing the updated post details
                 const post = new PostModel(
-                    id,
-                    existingPost.userid,
-                    cleanTitle,
-                    existingPost.createdAt,
-                    cleanContent,
+                    id, // Keep the existing post ID
+                    existingPost.userid, // Keep the original author's user ID
+                    cleanTitle, // Updated and validated post title
+                    existingPost.createdAt,  // Preserve the original creation date
+                    cleanContent, // Updated and validated post content
                 );
 
-                await PostModel.update(post);
+                await PostModel.update(post);  // Update the existing post record in the MySQL database
 
-                return res.redirect("/post/member");
+                return res.redirect("/post/member"); // Redirect the member back to the posts page after updating
             }
 
             return res.status(400).render("status.ejs", {
@@ -369,9 +549,25 @@ export class PostController {
         }
     }
     
-    // ==================== TRAINER MICROBLOG ====================
+// ==================== TRAINER MICROBLOG ====================
 
-    // Display all microblog posts for the logged-in trainer
+/**
+ * Retrieves and displays community microblog posts for trainers.
+ *
+ * Uses PostModel to retrieve all blog posts
+ * from the MySQL database.
+ *
+ * Renders the trainer posts EJS page
+ * with the authenticated trainer and post information.
+ *
+ * Returns HTTP 500 if the posts cannot be loaded.
+ *
+ * @static
+ * @async
+ * @param {Object} req - The Express request object containing the authenticated trainer.
+ * @param {Object} res - The Express response object used to render the trainer posts page.
+ * @returns {Promise<Object>} A promise resolving to the rendered page or error response.
+ */
 static async viewTrainerPosts(req, res) {
 
         // Start error handling for the database and page-loading code
@@ -404,15 +600,55 @@ static async viewTrainerPosts(req, res) {
     }
 }
 
-    // Display the trainer create-post page
+    
+    /**
+     * Displays the page for trainers to create new microblog posts.
+     *
+     * Renders the trainer create-post EJS template
+     * and provides the authenticated trainer's information.
+     *
+     * Initialises the error value to null.
+     *
+     * @static
+     * @param {Object} req - The Express request object containing the authenticated trainer.
+     * @param {Object} res - The Express response object used to render the create-post page.
+     * @returns {Object} The Express response rendering the trainer create-post page.
+     */
     static viewCreateTrainerPostPage(req, res) {
         return res.render("trainer_create_post.ejs", {
             authenticatedUser: req.user,
             error: null,
         });
     }
-
-    // Handle trainer create, update and delete actions
+ 
+    /**
+     * Handles creating, updating and deleting trainer microblog posts.
+     *
+     * Retrieves the authenticated trainer and submitted
+     * post details from the request body.
+     *
+     * Validates post titles and content using validatePost().
+     *
+     * Allows trainers to create posts associated
+     * with their own user ID.
+     *
+     * Checks post ownership before allowing trainers
+     * to update or delete their existing posts.
+     *
+     * Uses PostModel to create, update and delete
+     * microblog records in the MySQL database.
+     *
+     * Redirects to the trainer posts page on success.
+     * Returns HTTP 400 for invalid input or actions,
+     * HTTP 403 for forbidden access, HTTP 404 for missing posts,
+     * or HTTP 500 if a database operation fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated trainer and submitted post details.
+     * @param {Object} res - The Express response object used for redirects and error pages.
+     * @returns {Promise<Object>} A promise resolving to the trainer post management response.
+     */
     static async handleTrainerPost(req, res) {
         try {
             const user = req.user;
@@ -530,7 +766,34 @@ static async viewTrainerPosts(req, res) {
         }
     }
 
-    // Administrator create, update and delete post management
+    /**
+     * Handles administrator blog post management operations.
+     *
+     * Retrieves the requested CRUD action, post ID,
+     * title, content and optional user ID from the form.
+     *
+     * Allows administrators to create, update
+     * and delete blog posts in the MySQL database.
+     *
+     * Validates post titles and content using validatePost().
+     *
+     * When creating a post, assigns it to the selected user
+     * or the authenticated administrator.
+     *
+     * When updating a post, preserves the original
+     * user ID and creation date.
+     *
+     * Uses PostModel to perform database operations.
+     *
+     * Redirects to the administrator post management page
+     * on success or displays an error page if an operation fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the administrator and submitted post details.
+     * @param {Object} res - The Express response object used for redirects and error pages.
+     * @returns {Promise<Object>} A promise resolving to the administrator post management response.
+     */
     static async handlePostsManagement(req, res) {
         try {
             const { action, id, title, content, userId } = req.body;
@@ -575,7 +838,7 @@ static async viewTrainerPosts(req, res) {
                 });
             }
 
-            // ==================== TRAINER CREATE POST ====================
+            // ==================== ADMIN CREATE POST ====================
 
             if (action === "create") {
 
@@ -595,7 +858,7 @@ static async viewTrainerPosts(req, res) {
                 return res.redirect("/post");
             }
 
-            // ==================== TRAINER UPDATE OWN POST ====================
+            // ==================== ADMIN UPDATE POST ====================
 
             if (action === "update") {
                 const existingPost = await PostModel.getById(id);// Get the existing post from the database using its post ID

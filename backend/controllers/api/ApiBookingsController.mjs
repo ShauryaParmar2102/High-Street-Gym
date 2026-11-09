@@ -4,6 +4,17 @@ import { BookingModel } from "../../models/BookingModel.mjs";
 import { DatabaseModel } from "../../models/DatabaseModel.mjs";
 import { SessionActivityModel } from "../../models/SessionActivityModel.mjs";
 
+/**
+ * Handles booking API requests in the High Street Gym system.
+ *
+ * Provides endpoints for creating, retrieving and deleting
+ * gym bookings for authenticated users.
+ *
+ * Also allows members to export their bookings as XML.
+ *
+ * Uses authentication middleware and booking models
+ * to manage booking-related operations.
+ */
 export class ApiBookingsController{
     static routes = express.Router();
 
@@ -24,10 +35,26 @@ export class ApiBookingsController{
     this.routes.delete("/:id", this.deleteBooking); // Delete a booking by ID
 }
 
-// ==========  POST - CREATE BOOKING ==========
-// Creates a new booking for the authenticated user.
-// Saves the booking to MySQL and returns HTTP 200 on success.
-// Returns HTTP 409 when a duplicate booking is detected.
+    // ========== POST - CREATE BOOKING ==========
+
+    /**
+     * Creates a new gym booking for the authenticated member.
+     *
+     * Retrieves the member ID from the authenticated user
+     * and the session ID from the request body.
+     *
+     * Saves the booking to MySQL and returns HTTP 200 on success.
+     *
+     * Returns HTTP 409 if a duplicate booking is detected
+     * and HTTP 500 if a database or server error occurs.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated user and session ID.
+     * @param {Object} res - The Express response object used to send booking results.
+     * @returns {Promise<Object>} A promise resolving to the HTTP response
+     * indicating whether the booking was created successfully.
+     */
     static async createBooking(req, res) {
         try {
             const booking = new BookingModel(
@@ -59,13 +86,25 @@ export class ApiBookingsController{
     return res.status(500).json({
         message: "Unable to book this session. Please try again later.",
         errors: [error.message || error],
-    });
+        });
+    }
 }
-}
-
-// ========== GET - MEMBER BOOKINGS ==========
-// Retrieves bookings belonging to the authenticated user.
-// Returns booking records as JSON with HTTP 200.
+    /**
+     * Retrieves all active bookings belonging to the authenticated member.
+     *
+     * Uses the member's ID to retrieve their bookings
+     * from the MySQL database through BookingModel.
+     *
+     * Returns the bookings as JSON with HTTP 200 on success
+     * or HTTP 500 if the bookings cannot be retrieved.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated user.
+     * @param {Object} res - The Express response object used to return booking data.
+     * @returns {Promise<Object>} A promise resolving to an HTTP response
+     * containing the member's bookings or an error message.
+     */
     static async getUserBookings(req,res) {
         try {
             const bookings = await BookingModel.getByMemberId(req.authenticatedUser.id);
@@ -78,9 +117,24 @@ export class ApiBookingsController{
         }
     }
 
-// ========== OBSERVATION: DELETE - CANCEL BOOKING ==========
-// Deletes a booking using its booking ID.
-// Returns HTTP 400 for an invalid ID and 200 on success.
+    /**
+     * Deletes a gym booking using its unique booking ID.
+     *
+     * Retrieves the booking ID from the request parameters
+     * and checks that it is a valid number.
+     *
+     * Uses BookingModel to permanently remove the booking.
+     *
+     * Returns HTTP 400 for an invalid booking ID,
+     * HTTP 200 on success or HTTP 500 if deletion fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the booking ID.
+     * @param {Object} res - The Express response object used to send deletion results.
+     * @returns {Promise<Object>} A promise resolving to an HTTP response
+     * indicating whether the booking was deleted successfully.
+     */
     static async deleteBooking(req, res) {
         try {
             const id = Number(req.params.id);
@@ -103,32 +157,54 @@ export class ApiBookingsController{
             });
         }
     }
-    // ========== XML BOOKING EXPORT ==========
-    // Retrieves the authenticated user's booking history.
-    // Combines bookings with session information.
-    // Generates XML using an EJS template.
+    /**
+     * Exports the authenticated member's active bookings as XML.
+     *
+     * Retrieves the member's bookings and related gym
+     * session information from the database.
+     *
+     * Combines booking and session data and generates
+     * an XML document using an EJS template.
+     *
+     * Includes the current date formatted for Brisbane.
+     *
+     * Returns HTTP 200 with XML content on success
+     * or HTTP 500 if the export fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated member.
+     * @param {Object} res - The Express response object used to render the XML document.
+     * @returns {Promise<Object>} A promise resolving to the HTTP response
+     * containing the XML export or an error message.
+     */
     static async getMemberBookingsXML(req, res) {
         try{
+            // Format the current date using Brisbane's timezone
             const date = new Date().toLocaleDateString("en-AU", {
-    timeZone: "Australia/Brisbane",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-}).split("/").reverse().join("-");
-            const bookings = await BookingModel.getByMemberId(req.authenticatedUser.id);
+            timeZone: "Australia/Brisbane",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+            }).split("/").reverse().join("-");
 
-const sessions = await SessionActivityModel.getAll();
+        // Retrieve all active bookings for the logged-in member
+        const bookings = await BookingModel.getByMemberId(req.authenticatedUser.id);
 
-const enrichedBookings = bookings.map((booking) => {
-    const session = sessions.find(
-        (s) => Number(s.session.id) === Number(booking.sessionId)
-    );
+        // Retrieve all gym sessions with their related information
+        const sessions = await SessionActivityModel.getAll();
 
-    return {
-        ...booking,
-        session: session || null,
-    };
-});
+        // Combine each booking with its matching session information
+        const enrichedBookings = bookings.map((booking) => {
+            const session = sessions.find(
+                (s) => Number(s.session.id) === Number(booking.sessionId)
+            );
+
+            return {
+                ...booking,
+                session: session || null,
+            };
+        });
 
         return res
             .status(200)

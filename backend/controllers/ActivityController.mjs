@@ -2,6 +2,18 @@ import express from "express";
 import { ActivityModel } from "../models/ActivityModel.mjs";
 import { AuthenticationController } from "./AuthenticationController.mjs";
 
+/**
+ * Handles gym activity management in the High Street Gym system.
+ *
+ * Provides routes for viewing, searching, creating,
+ * updating and deleting gym activities.
+ *
+ * Uses ActivityModel to interact with the MySQL database
+ * and renders activity information using EJS views.
+ *
+ * Applies role-based authorisation to restrict
+ * activity management to administrators and trainers.
+ */
 export class ActivityController {
     static routes = express.Router(); // Creates an Express router specifically for activity routes
 
@@ -42,7 +54,26 @@ export class ActivityController {
         );
     }
 
-    // Loads activities and displays the activity management page
+    /**
+     * Retrieves and displays gym activities from the database.
+     *
+     * Uses ActivityModel to retrieve all activities
+     * and supports optional searching by name or description.
+     *
+     * Finds the selected activity using its ID
+     * or creates an empty activity object for the form.
+     *
+     * Renders the activity management page using EJS.
+     *
+     * Returns the activity management page on success
+     * or HTTP 500 if the activities cannot be loaded.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing search values and activity ID.
+     * @param {Object} res - The Express response object used to render the activity page.
+     * @returns {Promise<Object>} A promise resolving to the rendered page or error response.
+     */
     static async viewActivities(req, res) {
         try {
 
@@ -94,11 +125,45 @@ export class ActivityController {
         }
     }
 
-    // Handle CRUD operations for activities - Supported actions: Create, Update, Delete
+    /**
+     * Handles creating, updating and deleting gym activities.
+     *
+     * Retrieves the selected CRUD action and activity
+     * information from the submitted form.
+     *
+     * Validates activity names and descriptions,
+     * including required fields, length restrictions
+     * and prevention of HTML input.
+     *
+     * Uses ActivityModel to save or update activities
+     * in the MySQL database.
+     *
+     * When deleting an activity, removes related bookings
+     * and sessions before deleting the activity itself.
+     *
+     * Displays validation errors when invalid data is submitted.
+     *
+     * Redirects to the activity management page on success
+     * or renders an error page if a database operation fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the CRUD action and activity details.
+     * @param {Object} res - The Express response object used for redirects and rendered pages.
+     * @returns {Promise<Object>} A promise resolving to a redirect, rendered page or error response.
+     */
     static async handleActivities(req, res) {
-
-        // Checks whether user input contains HTML tags.
-        // This is used to reject HTML input such as <script> tags
+        
+        /**
+         * Checks whether the provided input contains HTML tags.
+         *
+         * Uses a regular expression to detect HTML-like tags
+         * in the submitted activity name or description.
+         *
+         * @param {string} [input=""] - The text to check for HTML tags.
+         * @returns {boolean} True if HTML-like tags are detected,
+         * otherwise false.
+         */
         function containsHTML(input = "") {
             return /<[^>]*>/g.test(input);
         }

@@ -59,7 +59,18 @@ console.log(
     Object.keys(specification.paths["/sessions"] || {})
 );
 
-
+/**
+ * Configures the main API router for the High Street Gym system.
+ *
+ * Provides Swagger UI documentation and validates
+ * incoming API requests using the OpenAPI specification.
+ *
+ * Registers authentication, session, user, post
+ * and booking routes through their respective controllers.
+ *
+ * Also provides middleware for handling API errors
+ * and returning JSON error responses.
+ */
 export class ApiController {
     // Main router for all API endpoints
     static routes = express.Router();
@@ -113,8 +124,21 @@ export class ApiController {
         this.routes.use("/bookings", ApiBookingsController.routes);
 
         // ========== API ERROR HANDLING ==========
-        // Catches API errors and returns JSON responses.
-        // Uses the error's HTTP status code or 500 when no status is provided.
+
+        /**
+         * Handles errors that occur during API requests.
+         *
+         * Logs the error and returns a JSON response containing
+         * the HTTP status, error message and validation errors.
+         *
+         * Uses HTTP 500 if the error has no status code.
+         *
+         * @param {Object} err - The error that occurred.
+         * @param {Object} req - The Express request object.
+         * @param {Object} res - The Express response object.
+         * @param {Function} next - The next middleware callback.
+         * @returns {Object} The JSON HTTP error response.
+         */
         this.routes.use((err, req, res, next) => {
             console.error(err);
 

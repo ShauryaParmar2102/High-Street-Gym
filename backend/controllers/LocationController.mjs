@@ -2,6 +2,18 @@ import express from "express";
 import { LocationModel } from "../models/LocationModel.mjs";
 import { AuthenticationController } from "./AuthenticationController.mjs";
 
+/**
+ * Handles gym location management in the High Street Gym system.
+ *
+ * Provides routes for viewing, searching, creating,
+ * updating and deleting gym locations.
+ *
+ * Uses LocationModel to interact with the MySQL database
+ * and EJS templates to display location information.
+ *
+ * Applies role-based authorisation to restrict
+ * location management to administrators and trainers.
+ */
 export class LocationController {
     static routes = express.Router(); // Creates a router specifically for location-related routes
 
@@ -37,6 +49,27 @@ export class LocationController {
         );
     }
 
+    /**
+     * Retrieves and displays gym locations from the database.
+     *
+     * Uses LocationModel to retrieve all locations
+     * and supports optional searching by name or address.
+     *
+     * Finds the selected location using its ID
+     * or creates an empty LocationModel for the form.
+     *
+     * Renders the location management EJS page
+     * with the available locations and selected location.
+     *
+     * Returns the rendered page on success
+     * or HTTP 500 if the locations cannot be loaded.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the optional search query and location ID.
+     * @param {Object} res - The Express response object used to render the location management page.
+     * @returns {Promise<Object>} A promise resolving to the rendered page or error response.
+     */
     static async viewLocations(req, res) {
         try {
             const search = req.query.search || ""; // Get search input
@@ -77,17 +110,55 @@ export class LocationController {
         }
     }
 
+    /**
+     * Handles creating, updating and deleting gym locations.
+     *
+     * Retrieves the requested action, location ID,
+     * name and address from the submitted form.
+     *
+     * Validates location names and addresses, including
+     * required fields, length restrictions, uppercase
+     * naming requirements and prevention of HTML input.
+     *
+     * Uses LocationModel to create, update or delete
+     * location records in the MySQL database.
+     *
+     * Redisplays the location management page when
+     * validation errors occur.
+     *
+     * Handles database errors that may occur
+     * during location management operations.
+     *
+     * Redirects to the location management page on success
+     * or displays an error page if a database operation fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the location ID, CRUD action and form details.
+     * @param {Object} res - The Express response object used for redirects and rendered pages.
+     * @returns {Promise<Object>} A promise resolving to a redirect, rendered page or error response.
+     */
+    
     static async handleLocations(req, res) {
-            // Reject input containing HTML tags to reduce the risk of XSS attacks.
+        /**
+         * Checks whether the provided input contains HTML-like tags.
+         *
+         * Uses a regular expression to detect HTML-like tags
+         * in submitted location names and addresses.
+         *
+         * @param {string} [input=""] - The text to check for HTML-like tags.
+         * @returns {boolean} True if HTML-like tags are detected,
+         * otherwise false.
+         */
         function containsHTML(input = "") {
             return /<[^>]*>/.test(input);
         }
-        const { action } = req.body;
-        const id = req.params.id || req.body.id;
-        const name = req.body.name?.trim();
-        const address = req.body.address?.trim();
+        const { action } = req.body;  // Get the CRUD action submitted by the location management form
+        const id = req.params.id || req.body.id; // Get the location ID from the URL or the submitted form
+        const name = req.body.name?.trim(); // Get the location name and remove leading and trailing spaces
+        const address = req.body.address?.trim();  // Get the location address and remove leading and trailing spaces
 
-        let error = null;
+        let error = null; // Initialise a variable to store any validation error messages
 
         //Validation - For Location
         if (!name || name.length < 2) {

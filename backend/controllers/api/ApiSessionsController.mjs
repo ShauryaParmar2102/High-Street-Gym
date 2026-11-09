@@ -6,6 +6,18 @@ import { SessionActivityModel } from "../../models/SessionActivityModel.mjs";
 import { ActivityModel } from "../../models/ActivityModel.mjs";
 import { LocationModel } from "../../models/LocationModel.mjs";
 
+/**
+ * Handles gym session API requests in the High Street Gym system.
+ *
+ * Provides endpoints for retrieving, creating, updating
+ * and deleting gym sessions.
+ *
+ * Also retrieves available gym activities and locations,
+ * manages trainer sessions and exports sessions as XML.
+ *
+ * Uses authentication and role-based authorisation
+ * to control access to protected API endpoints.
+ */
 export class ApiSessionsController {
     static routes = express.Router(); // Create an Express router for API session routes
 
@@ -53,7 +65,22 @@ this.routes.put(
     );
 }
 
-// Get all available activities
+/**
+ * Retrieves all available gym activities from the database.
+ *
+ * Uses ActivityModel to retrieve activity records
+ * and returns them as JSON to the React frontend.
+ *
+ * Returns HTTP 200 on success or HTTP 500
+ * if the activities cannot be retrieved.
+ *
+ * @static
+ * @async
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object used to return activity data.
+ * @returns {Promise<Object>} A promise resolving to the HTTP response
+ * containing the activities or an error message.
+ */
 static async getActivities(req, res) {
     try {
         const activities = await ActivityModel.getAll();
@@ -67,7 +94,22 @@ static async getActivities(req, res) {
     }
 }
 
-// Get all available locations
+/**
+ * Retrieves all available gym locations from the database.
+ *
+ * Uses LocationModel to retrieve location records
+ * and returns them as JSON to the React frontend.
+ *
+ * Returns HTTP 200 on success or HTTP 500
+ * if the locations cannot be retrieved.
+ *
+ * @static
+ * @async
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object used to return location data.
+ * @returns {Promise<Object>} A promise resolving to the HTTP response
+ * containing the locations or an error message.
+ */
 static async getLocations(req, res) {
     try {
         const locations = await LocationModel.getAll();
@@ -81,9 +123,33 @@ static async getLocations(req, res) {
     }
 }
 
-
 // ==================== CREATE TRAINER SESSION ====================
-// Validates session details, prevents duplicates and saves new sessions to MySQL.
+
+/**
+ * Creates a new gym session for an authenticated trainer.
+ *
+ * Retrieves the trainer ID and session details
+ * from the authenticated user and request body.
+ *
+ * Validates required fields, session dates, times
+ * and capacity before saving the session.
+ *
+ * Prevents sessions from being created in the past
+ * and checks for duplicate sessions.
+ *
+ * Uses SessionModel to save the new session to MySQL.
+ *
+ * Returns HTTP 201 on success, HTTP 400 for invalid data,
+ * HTTP 409 for duplicate sessions or HTTP 500 on errors.
+ *
+ * @static
+ * @async
+ * @param {Object} req - The Express request object containing the authenticated trainer and session details.
+ * @param {Object} res - The Express response object used to send session creation results.
+ * @returns {Promise<Object>} A promise resolving to the HTTP response
+ * indicating whether the session was created successfully.
+ */
+
 static async createTrainerSession(req, res) {
     try {
         const trainerId = Number(req.authenticatedUser.id);
@@ -176,9 +242,30 @@ static async createTrainerSession(req, res) {
     }
 }
 
-    // ==================== GET ALL SESSIONS ====================
+// ==================== GET ALL SESSIONS ====================
 
-    // Get all sessions and return them as JSON data
+    /**
+     * Retrieves gym sessions and their related information.
+     *
+     * Uses SessionActivityModel to retrieve sessions
+     * with their activity, location and trainer details.
+     *
+     * Supports an optional search filter from the request.
+     *
+     * Formats session dates and times and checks whether
+     * each session has already expired.
+     *
+     * Returns formatted session data as JSON with HTTP 200
+     * or HTTP 500 if the sessions cannot be retrieved.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the optional search filter.
+     * @param {Object} res - The Express response object used to return session data.
+     * @returns {Promise<Object>} A promise resolving to the HTTP response
+     * containing formatted sessions or an error message.
+     */
+
     static async getSessions(req, res) {
         try {
             const { filter } = req.query; // Get the optional search/filter value from the request 
@@ -243,7 +330,29 @@ const sessions =
     }
 
 // ==================== GET SESSIONS AS XML ====================
-// Generates a sessions XML document with session IDs, activities, locations, formatted dates, start times, end times and capacities.
+
+    /**
+     * Exports the authenticated trainer's gym sessions as XML.
+     *
+     * Retrieves sessions belonging to the trainer
+     * using SessionActivityModel.
+     *
+     * Generates an XML document containing session IDs,
+     * activities, locations, dates, times and capacities.
+     *
+     * Includes a document type definition (DTD)
+     * describing the structure of the XML document.
+     *
+     * Returns HTTP 200 with XML content on success
+     * or HTTP 500 if the export fails.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated trainer.
+     * @param {Object} res - The Express response object used to return the XML document.
+     * @returns {Promise<Object>} A promise resolving to the HTTP response
+     * containing the XML document or an error message.
+     */
     static async getSessionsXML(req, res) {
         try {
             // Fetch all sessions with their related details from the database
@@ -306,7 +415,25 @@ const sessions =
     }
 
 // ==================== GET TRAINER SESSIONS ====================
-// Retrieves sessions belonging to the currently authenticated trainer.
+    /**
+     * Retrieves all gym sessions belonging to the authenticated trainer.
+     *
+     * Checks whether the user is authenticated before
+     * retrieving their assigned sessions from MySQL.
+     *
+     * Uses SessionActivityModel to find sessions
+     * associated with the trainer's user ID.
+     *
+     * Returns HTTP 200 with session data on success,
+     * HTTP 401 if unauthenticated or HTTP 500 on errors.
+     *
+     * @static
+     * @async
+     * @param {Object} req - The Express request object containing the authenticated trainer.
+     * @param {Object} res - The Express response object used to return trainer sessions.
+     * @returns {Promise<Object>} A promise resolving to the HTTP response
+     * containing the trainer's sessions or an error message.
+     */
    static async getTrainerSessionsById(req, res) {
     try {
         // Check if the user is authenticated
@@ -331,7 +458,32 @@ const sessions =
          }
 
     // ==================== UPDATE SESSION ====================
-// Validates updated session details and saves changes to MySQL and checks that the user owns the session or is an administrator.
+
+/**
+ * Updates an existing gym session in the database.
+ *
+ * Retrieves the session ID and updated session details
+ * from the request parameters and request body.
+ *
+ * Checks that the session exists and that the user
+ * is either the assigned trainer or an administrator.
+ *
+ * Validates the updated activity, location, date,
+ * times and capacity before saving the changes.
+ *
+ * Uses SessionModel to update the session in MySQL.
+ *
+ * Returns HTTP 200 on success, HTTP 400 for invalid data,
+ * HTTP 403 for forbidden access, HTTP 404 if not found,
+ * or HTTP 500 if an error occurs.
+ *
+ * @static
+ * @async
+ * @param {Object} req - The Express request object containing the session ID, updated details and authenticated user.
+ * @param {Object} res - The Express response object used to send update results.
+ * @returns {Promise<Object>} A promise resolving to the HTTP response
+ * indicating whether the session was updated successfully.
+ */
 static async updateTrainerSession(req, res) {
     try {
         const id = Number(req.params.id);
@@ -435,18 +587,37 @@ session.capacity = Number(capacity);
     }
 }
 
-         // ==================== DELETE SESSION ====================
+// ==================== DELETE SESSION ====================
 
-         // Delete a trainer session using its session ID
-         static async deleteTrainerSessions(req, res) {
-            try {
-                const id = Number(req.params.id);  // Convert the session ID from the URL into a number
+/**
+ * Permanently deletes a gym session using its unique ID.
+ *
+ * Retrieves the session ID from the request parameters.
+ *
+ * Uses BookingModel to delete bookings associated
+ * with the session before removing the session itself.
+ *
+ * Uses SessionModel to delete the session from MySQL.
+ *
+ * Returns HTTP 200 when deletion succeeds
+ * or HTTP 500 if a database or server error occurs.
+ *
+ * @static
+ * @async
+ * @param {Object} req - The Express request object containing the session ID.
+ * @param {Object} res - The Express response object used to send deletion results.
+ * @returns {Promise<Object>} A promise resolving to the HTTP response
+ * indicating whether the session was deleted successfully.
+ */
+static async deleteTrainerSessions(req, res) {
+    try {
+        const id = Number(req.params.id);  // Convert the session ID from the URL into a number
                 
-                // Delete all bookings associated with the session first
-await BookingModel.deleteBySessionId(id);
+        // Delete all bookings associated with the session first
+        await BookingModel.deleteBySessionId(id);
 
-// Delete the session after its bookings have been removed
-await SessionModel.delete(id);
+        // Delete the session after its bookings have been removed
+        await SessionModel.delete(id);
 
                 return res.status(200).json({
                     message: "Session deleted successfully"
