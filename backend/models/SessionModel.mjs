@@ -62,7 +62,7 @@ export class SessionModel extends DatabaseModel {
      */
     static tableToModel(row) {
 
-        // Use the sessions data if it exists, otherwise use the row directly
+    // Use the sessions data if it exists, otherwise use the row directly
     const r = row.sessions || row;
 
 // Convert one database row into a SessionModel object
