@@ -28,15 +28,14 @@ export class PostModel extends DatabaseModel{
      */
     constructor(id, userid, title, createdAt, content, firstName = null, lastName = null){
         super(); //Calls parent class constructor
-
-    this.id = id; //Stores Post ID 
-    this.userid = userid; // Stores the ID of the user who created the post
-    this.title = title; // Stores the post title
-    this.createdAt = createdAt;// Stores the date and time the post was created
-    this.content = content; //Stores the main content of the post
-    this.firstName = firstName; //Stores the author's first name if availiable
-    this.lastName = lastName; //Stores the author's Last name if availiable
-    }
+        this.id = id; //Stores Post ID 
+        this.userid = userid; // Stores the ID of the user who created the post
+        this.title = title; // Stores the post title
+        this.createdAt = createdAt;// Stores the date and time the post was created
+        this.content = content; //Stores the main content of the post
+        this.firstName = firstName; //Stores the author's first name if availiable
+        this.lastName = lastName; //Stores the author's Last name if availiable
+        }
 
     /**
      * Converts a database row into a PostModel object.
