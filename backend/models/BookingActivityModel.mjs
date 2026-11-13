@@ -3,7 +3,7 @@
 import { DatabaseModel } from "./DatabaseModel.mjs";
 
 /**
- * Manages the retrieval of gym bookings with related details.
+ * Manages the retrieval of gym bookings with related details. 
  *
  * Extends DatabaseModel to retrieve booking data from MySQL.
  *
