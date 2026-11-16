@@ -15,7 +15,7 @@ The project features a **React frontend**, a **Node.js/Express backend**, and a 
 | | |
 |---|---|
 | 🏷️ **Project Name** | High Street Gym – Gym Management System |
-| 🧩 **Architecture** | React frontend communicating with a separate Node.js/Express REST API backend |
+| 🧩 **Architecture** | React frontend communicating with a separate Node.js/Express REST API backend connected to a MySQL database. |
 | 🛠️ **Tech Stack** | React, Vite, JavaScript, Node.js, Express.js, MySQL, HTML5, Tailwind CSS, DaisyUI, EJS, Swagger/OpenAPI |
 
 ---
