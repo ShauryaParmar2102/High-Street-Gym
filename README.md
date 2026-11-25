@@ -433,8 +433,13 @@ npm run dev
 
 Open the local URL displayed by Vite.
 
-
 ---
+
+## 📸 Screenshots
+
+### ⚛️ React Frontend
+
+### ⚙️ Backend – EJS Interface
 
 ## 👨‍💻 Development Process
 
