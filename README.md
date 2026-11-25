@@ -54,7 +54,7 @@ The project features a **React frontend**, a **Node.js/Express backend**, and a 
 | mysql2 | MySQL database connectivity |
 | validator | Input validation |
 | nodemon | Automatic server restart during development |
-| ejs | Server-side HTML templating |
+| EJS | Server-side HTML templating |
 | express-openapi-validator | OpenAPI request validation |
 
 ### 🔧 Development Tools
