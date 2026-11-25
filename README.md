@@ -433,20 +433,6 @@ Open the local URL displayed by Vite.
 
 ---
 
-## 📸 Screenshots
-
-Screenshots of the application can be added here.
-
-Suggested screenshots:
-
-- 🔐 Login and registration
-- 📅 Gym timetable
-- 🎟️ Member bookings
-- 📝 Blog posts
-- 🛡️ Administration dashboard
-
----
-
 ## 👨‍💻 Development Process
 
 During development, I worked on:
