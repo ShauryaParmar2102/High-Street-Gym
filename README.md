@@ -42,6 +42,7 @@ The project features a **React frontend**, a **Node.js/Express backend**, and a 
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
 ![bcryptjs](https://img.shields.io/badge/bcryptjs-Password%20Hashing-blue?style=for-the-badge)
+![EJS](https://img.shields.io/badge/EJS-B4CA65?style=for-the-badge&logo=ejs&logoColor=black)
 
 ### 📦 Backend Libraries
 
@@ -53,6 +54,8 @@ The project features a **React frontend**, a **Node.js/Express backend**, and a 
 | mysql2 | MySQL database connectivity |
 | validator | Input validation |
 | nodemon | Automatic server restart during development |
+| ejs | Server-side HTML templating |
+| express-openapi-validator | OpenAPI request validation |
 
 ### 🔧 Development Tools
 
