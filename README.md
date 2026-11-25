@@ -16,7 +16,7 @@ The project features a **React frontend**, a **Node.js/Express backend**, and a 
 |---|---|
 | 🏷️ **Project Name** | High Street Gym – Gym Management System |
 | 🧩 **Architecture** | React frontend communicating with a separate Node.js/Express REST API backend connected to a MySQL database. |
-| 🛠️ **Tech Stack** | React, Vite, JavaScript, Node.js, Express.js, MySQL, HTML5, Tailwind CSS, DaisyUI, EJS, Swagger/OpenAPI |
+| 🛠️ **Tech Stack** | React, Vite, JavaScript, Node.js, Express.js, bcrypt, MySQL, HTML5, Tailwind CSS, DaisyUI, EJS, Swagger/OpenAPI |
 
 ---
 
@@ -38,6 +38,7 @@ The project features a **React frontend**, a **Node.js/Express backend**, and a 
 ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
+![bcryptjs](https://img.shields.io/badge/bcryptjs-Password%20Hashing-blue?style=for-the-badge)
 
 ### 🔧 Development Tools
 
@@ -52,10 +53,11 @@ The project features a **React frontend**, a **Node.js/Express backend**, and a 
 ### 👤 Authentication and User Management
 
 - User registration and login
+- Secure password hashing and verification using bcryptjs
 - Authentication-key-based access
 - Role-based permissions for members, trainers and administrators
 - User management functionality for administrators
-
+  
 ### 📅 Gym Timetable
 
 - Browse available gym sessions
@@ -216,7 +218,7 @@ High Street Gym allows users to register and access features based on their assi
 
 - Users must provide a valid email address, such as `example@gmail.com`.
 - Each email address must be unique.
-- Passwords are securely hashed before being stored in the database.
+- Passwords are securely hashed using bcryptjs before being stored in the database.
 - New accounts are automatically assigned the `member` role.
 
 #### 🛡️ User Roles
@@ -236,6 +238,8 @@ Administrators can change a user's role to `member`, `trainer` or `administrator
 **Activities Table**
 
 Stores the different gym activities.
+
+**🔒 Security Note:** Passwords are securely hashed using bcryptjs before being stored in the MySQL database. Use the application's registration functionality to ensure passwords are hashed correctly and never stored as plaintext.
 
 ```sql
 CREATE TABLE activities (
