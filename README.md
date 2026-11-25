@@ -439,7 +439,114 @@ Open the local URL displayed by Vite.
 
 ### ⚛️ React Frontend
 
+#### 👤 Member Interface
+
+**Login**
+![Login](React%20frontend%20Screenshots/Desktop%20-%20Chrome/member/login.png)
+
+**Registration**
+![Registration](React%20frontend%20Screenshots/Desktop%20-%20Chrome/member/register.png)
+
+**Gym Timetable**
+![Gym Timetable](React%20frontend%20Screenshots/Desktop%20-%20Chrome/member/member-timetable.png)
+
+**My Bookings**
+![My Bookings](React%20frontend%20Screenshots/Desktop%20-%20Chrome/member/member-bookings.png)
+
+**Gym Blog**
+![Gym Blog](React%20frontend%20Screenshots/Desktop%20-%20Chrome/member/member-blog.png)
+
+**My Profile**
+![My Profile](React%20frontend%20Screenshots/Desktop%20-%20Chrome/member/ProfileView.png)
+
+**Privacy Policy**
+![Privacy Policy](React%20frontend%20Screenshots/Desktop%20-%20Chrome/member/PrivacyPolicy.png)
+
+#### 🏋️ Trainer Interface
+
+**Trainer Login**
+![Trainer Login](React%20frontend%20Screenshots/Desktop%20-%20Chrome/trainer/Login.png)
+
+**Trainer Registration**
+![Trainer Registration](React%20frontend%20Screenshots/Desktop%20-%20Chrome/trainer/Register.png)
+
+**My Sessions**
+![My Sessions](React%20frontend%20Screenshots/Desktop%20-%20Chrome/trainer/trainer-sessions.png)
+
+**Trainer Blog**
+![Trainer Blog](React%20frontend%20Screenshots/Desktop%20-%20Chrome/trainer/trainer-blog.png)
+
+**Trainer Profile**
+![Trainer Profile](React%20frontend%20Screenshots/Desktop%20-%20Chrome/trainer/ProfileView.png)
+
+**Privacy Policy**
+![Privacy Policy](React%20frontend%20Screenshots/Desktop%20-%20Chrome/trainer/PrivacyPolicy.png)
+
+---
+
 ### ⚙️ Backend – EJS Interface
+
+#### 👤 Member Interface
+
+**Login**
+![Login](Backend%20Screenshots/member/Login.png)
+
+**Registration**
+![Registration](Backend%20Screenshots/member/Register.png)
+
+**Member Dashboard**
+![Member Dashboard](Backend%20Screenshots/member/memberdashboard.png)
+
+**Session Timetable**
+![Session Timetable](Backend%20Screenshots/member/session%20timetable.png)
+
+**Bookings**
+![Bookings](Backend%20Screenshots/member/bookings.png)
+
+**Blog Posts**
+![Blog Posts](Backend%20Screenshots/member/posts.png)
+
+**Create New Post**
+![Create New Post](Backend%20Screenshots/member/Create%20New%20Post.png)
+
+#### 🏋️ Trainer Interface
+
+**Trainer Dashboard**
+![Trainer Dashboard](Backend%20Screenshots/trainer/Trainer%20Dashboard.png)
+
+**Trainer Sessions**
+![Trainer Sessions](Backend%20Screenshots/trainer/trainer%20sessions.png)
+
+**Trainer Microblog**
+![Trainer Microblog](Backend%20Screenshots/trainer/trainer%20microblog.png)
+
+**Create Post**
+![Create Post](Backend%20Screenshots/trainer/create%20post%20.png)
+
+#### 🛡️ Administrator Interface
+
+**Admin Dashboard**
+![Admin Dashboard](Backend%20Screenshots/admin/Admin%20Dashboard.png)
+
+**User Management**
+![User Management](Backend%20Screenshots/admin/manage%20users.png)
+
+**Activity Management**
+![Activity Management](Backend%20Screenshots/admin/Activity%20Management.png)
+
+**Location Management**
+![Location Management](Backend%20Screenshots/admin/Location%20Management.png)
+
+**Session Management**
+![Session Management](Backend%20Screenshots/admin/session%20management.png)
+
+**Booking Management**
+![Booking Management](Backend%20Screenshots/admin/manage%20bookings.png)
+
+**Post Management**
+![Post Management](Backend%20Screenshots/admin/manage%20posts.png)
+
+---
 
 ## 👨‍💻 Development Process
 
