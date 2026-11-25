@@ -20,6 +20,9 @@ The project features a **React frontend**, a **Node.js/Express backend**, and a 
 
 ---
 
+### 🏗️ Application Architecture
+
+
 ## 🛠️ Technologies Used
 
 ### 🎨 Frontend
@@ -39,6 +42,17 @@ The project features a **React frontend**, a **Node.js/Express backend**, and a 
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
 ![bcryptjs](https://img.shields.io/badge/bcryptjs-Password%20Hashing-blue?style=for-the-badge)
+
+### 📦 Backend Libraries
+
+| Library | Purpose |
+|---|---|
+| bcryptjs | Password hashing and verification |
+| cors | Cross-Origin Resource Sharing |
+| express-session | Session management |
+| mysql2 | MySQL database connectivity |
+| validator | Input validation |
+| nodemon | Automatic server restart during development |
 
 ### 🔧 Development Tools
 
@@ -104,6 +118,10 @@ The project features a **React frontend**, a **Node.js/Express backend**, and a 
 - Authentication and authorisation checks
 - Swagger/OpenAPI documentation and endpoint testing
 - XML export functionality
+- Cross-Origin Resource Sharing (CORS) configuration
+- OPTIONS preflight request handling
+- OpenAPI request validation
+- HTTP status code and error handling
 
 ---
 
@@ -442,6 +460,15 @@ During development, I worked on:
 - Improving responsive layouts
 - Using documentation, reference projects and AI-assisted debugging to support development
 - Maintaining the project with Git and GitHub
+
+### 🧪 API Testing
+
+- REST API testing using Swagger UI
+- CORS preflight testing using Chrome Developer Tools
+- Testing authenticated and unauthenticated requests
+- Testing HTTP response status codes
+- Testing database CRUD operations
+- XML document validation using DTD
 
 ---
 
